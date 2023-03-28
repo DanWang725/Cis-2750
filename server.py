@@ -25,7 +25,7 @@ class Handler(BaseHTTPRequestHandler):
         mimetype = "text/css"
         sendReply = True
       if self.path.endswith(".js"):
-        mimetype = "text/babel"
+        mimetype = "application/javascript"
         sendReply = True
       
       if sendReply == True:
@@ -81,36 +81,16 @@ inputForm = """
   <head>
     <title> File Upload </title>
     <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-      <div id="root"></div>
-        <script src="https://unpkg.com/react@latest/umd/react.development.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/react@latest/umd/react.development.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/react-dom@latest/umd/react-dom.development.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js" crossorigin="anonymous"></script>
-    <script type="text/babel">
-        let createElement = React.createElement
-
-        let rootElement = (
-          <div className='ContactList'>
-            <h1 className='ContactList-title'>Contacts</h1>
-            <div>
-              <div className='Contact'>
-                <div className='Contact-avatar'>JN</div>
-                <span className='Contact-name'>Myron Myron</span>
-                <a href='mailto:mladyjen@uoguleph.ca' className='Contact-link'>mladyjen@uoguelph.ca</a>
-              </div>
-              <div className='Contact'>
-                <div className='Contact-avatar'>DW</div>
-                <span className='Contact-name'>Myron Myron</span>
-                <a href='mailto:dwang11@uoguleph.ca' className='Contact-link'>dwang11@uoguelph.ca</a>
-              </div>
-            </div>
-          </div>
-        )
-
-        // The `ReactDOM` variable is set by the second `<script>` tag
-        // in the above HTML file
-        ReactDOM.render(rootElement, document.getElementById('root'))
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    
+      <div id="root"></div>
+    <script src="billionaires.js" data-plugins="transform-es2015-modules-umd" type="text/babel"></script>
+    <script src="index.js" data-plugins="transform-es2015-modules-umd" type="text/babel">
 
     </script>
     <h1> File Upload </h1>
