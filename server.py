@@ -1,6 +1,7 @@
 import sys;
 import io;
 import os
+import json
 import MolDisplay
 from http.server import HTTPServer, BaseHTTPRequestHandler;
 
@@ -27,22 +28,42 @@ class Handler(BaseHTTPRequestHandler):
       if self.path.endswith(".js"):
         mimetype = "application/javascript"
         sendReply = True
+      if self.path.endswith(".json"):
+        mimetype = "application/json"
+        sendReply = True
       
       if sendReply == True:
-        f = open("src"+self.path, "r")
-        self.send_response(200)
-        css = ""
-        s = f.readline()
-        while s != "":
-          css += s
-          #print(s)
+        if self.path.endswith(".json"):
+          css = json.dumps([{ "code": 'H',
+              "name": 'Lol',
+              "radius": '40',
+              "colour": '#f19283'
+            },
+            { "code": 'C',
+              "name": 'Hydrogen',
+              "radius": '25',
+              "colour": '#amogus'
+            },
+            { "code": 'C',
+              "name": 'Hydrogen',
+              "radius": '25',
+              "colour": '#amogus'
+            }], indent=4)
+        else:
+          f = open("src"+self.path, "r")
+          css = ""
           s = f.readline()
+          while s != "":
+            css += s
+            #print(s)
+            s = f.readline()
+          f.close()
 
+        self.send_response(200)
         self.send_header("Content-type",mimetype)
         self.send_header( "Content-length", len(css) );
         self.end_headers()
         self.wfile.write(bytes(css, "utf-8"))
-        f.close()
         return
       
       self.send_response( 404 );

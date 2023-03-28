@@ -10,12 +10,33 @@ function ContactList(props){
     </div>
   );
 }
+function FetchTest(){
+  fetch("../test.json")
+  .then((response) => response.json())
+  .then((data) => data.forEach((element, i) => {
+    ListOfElements[i] = element;
+  }))
+  .then( () =>
+    ReactDOM.render(
+    <App elements={ListOfElements}/>,
+    document.getElementById('root')
+  ))
+}
+
+function Refresh(){
+  ReactDOM.render(
+    <App elements={ListOfElements}/>,
+    document.getElementById('root')
+  );
+}
 
 function ElementList(props){
   return (
     <div className='ContactList'>
       <h1>Elements</h1>
       {props.children}
+      <button onClick={FetchTest}>Test</button>
+      <button onClick={Refresh}>Refresh</button>
     </div>
   )
 }
@@ -40,7 +61,9 @@ function Element(props){
     <span className='ElementName'>
       {props.name}
     </span>
-    <p>Color: {props.colour} Radius: {props.radius}</p>
+    <span className='ElementInfo'>
+      Color: {props.colour} Radius: {props.radius}
+      </span>
   </div>
   );
 }
