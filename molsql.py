@@ -110,6 +110,15 @@ class Database:
         for bond in bonds:
             mol.append_bond(bond[1], bond[2], bond[3])
         return mol
+    def getMolecules(self):
+        mols = self.conn.execute("""
+            SELECT Molecules.NAME FROM Molecules;
+        """).fetchall();
+        moleculeList = {};
+        for name in mols:
+            #print(name[0]);
+            moleculeList[name[0]] = self.load_mol(name[0]);
+        return moleculeList;
     
     def radius(self):
         elements = self.conn.execute(f"""SELECT Elements.ELEMENT_CODE, Elements.RADIUS FROM 
@@ -167,9 +176,14 @@ if __name__ == "__main__":
     MolDisplay.radius = db.radius();
     MolDisplay.element_name = db.element_name();
     MolDisplay.header += db.radial_gradients();
-    for molecule in ['Water', 'Caffeine', 'Isopentanol' , 'Romanium']: #'Water', 'Caffeine', 'Isopentanol' , 
-        mol = db.load_mol( molecule );
-        mol.sort();
-        fp = open( molecule + ".svg", "w" );
-        fp.write( mol.svg(nightmare=True) );
-        fp.close();
+    
+    molculeList = db.getMolecules();
+    for name in molculeList:
+        print(name);
+    
+    # for molecule in ['Water', 'Caffeine', 'Isopentanol' , 'Romanium']: #'Water', 'Caffeine', 'Isopentanol' , 
+    #     mol = db.load_mol( molecule );
+    #     mol.sort();
+    #     fp = open( molecule + ".svg", "w" );
+    #     fp.write( mol.svg(nightmare=True) );
+    #     fp.close();
