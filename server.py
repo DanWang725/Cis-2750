@@ -3,10 +3,12 @@ import io;
 import os
 import json
 import MolDisplay
+import molsql
 from http.server import HTTPServer, BaseHTTPRequestHandler;
 
 # The port is 51584
 
+database = molsql.Database();
 class Handler(BaseHTTPRequestHandler):
   def do_GET(self):
     if self.path == "/":
@@ -31,24 +33,14 @@ class Handler(BaseHTTPRequestHandler):
       if self.path.endswith(".json"):
         mimetype = "application/json"
         sendReply = True
+
       
       if sendReply == True:
         if self.path.endswith(".json"):
-          css = json.dumps([{ "code": 'H',
-              "name": 'Lol',
-              "radius": '40',
-              "colour": '#f19283'
-            },
-            { "code": 'C',
-              "name": 'Hydrogen',
-              "radius": '25',
-              "colour": '#amogus'
-            },
-            { "code": 'C',
-              "name": 'Hydrogen',
-              "radius": '25',
-              "colour": '#amogus'
-            }], indent=4)
+          #css = json.dumps(database.getElementsJSON(), indent=4)
+          if self.path.endswith("addtest.json"):
+            database['Elements'] = ( 2, 'D', 'Deez Nuts', 'FFFFFF', '050505', '020202', 25 );
+          css = json.dumps(database.getElementsJSON(), indent=4)
         else:
           f = open("src"+self.path, "r")
           css = ""
@@ -92,6 +84,13 @@ class Handler(BaseHTTPRequestHandler):
       self.end_headers();
 
       self.wfile.write( bytes( svgString, "utf-8" ) );
+    elif self.path.endswith(".json"):
+      data = self.rfile.read(int(self.headers['Content-length']));
+      gottenData = json.loads(data.decode('utf-8'));
+      print(gottenData);
+      self.send_response( 404 );
+      self.end_headers();
+      self.wfile.write( bytes( "404: not found", "utf-8" ) );
     else:
       self.send_response( 404 );
       self.end_headers();
@@ -126,6 +125,5 @@ inputForm = """
   </body>
 </html>
 """;
-
 httpd = HTTPServer( ( 'localhost', int(sys.argv[1]) ), Handler );
 httpd.serve_forever();

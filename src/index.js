@@ -1,7 +1,7 @@
 import{ billionaires } from './billionaires'
-// import React, { useRef } from "https://cdn.skypack.dev/react";
-// import ReactDOM from "https://cdn.skypack.dev/react-dom";
-
+import { useState, useEffect} from 'React';
+//import ReactDOM from "https://cdn.skypack.dev/react-dom";
+/*
 function ContactList(props){
   return (
     <div className='ContactList'>
@@ -11,32 +11,101 @@ function ContactList(props){
   );
 }
 function FetchTest(){
-  fetch("../test.json")
-  .then((response) => response.json())
-  .then((data) => data.forEach((element, i) => {
-    ListOfElements[i] = element;
-  }))
-  .then( () =>
-    ReactDOM.render(
-    <App elements={ListOfElements}/>,
-    document.getElementById('root')
-  ))
-}
+  
+}*/
 
 function Refresh(){
   ReactDOM.render(
-    <App elements={ListOfElements}/>,
+    <App/>,
     document.getElementById('root')
   );
 }
 
+
+function ElementForm(props){
+  let [data, setData] = useState({code:0, name:'', colour:'', radius:0})
+  
+  const SendData = () =>{
+    console.log(data)
+  }
+
+  let handleChange = (evt)=> {
+    const value = evt.target.value;
+    setData((data)=> {
+      return({
+        ...data,
+        [evt.target.name]: value
+      });
+    });
+  }
+
+
+  let elements = (<div>
+    <ElementInputForm type="number" name="code" inputValue={data.code} onInputValueChange={handleChange}/>
+    <ElementInputForm type="text" name="name" inputValue={data.name} onInputValueChange={handleChange}/>
+    <ElementInputForm type="text" name="colour" inputValue={data.colour} onInputValueChange={handleChange}/>
+    <ElementInputForm type="number" name="radius" inputValue={data.radius} onInputValueChange={handleChange}/>
+    </div>)
+  return (<div>
+      <form>
+        {elements}
+      </form>
+      <button onClick={SendData}>Add Element</button>
+    </div>)
+  
+  
+}
+function ElementInputForm(props){
+  return (<label>{props.name}
+    <input type={props.type} name={props.name} value={props.inputValue} onChange={(e)=>{props.onInputValueChange(e)}}></input>
+  </label>);
+}
+
 function ElementList(props){
+  let [elements, setElement] = useState(null);
+
+  const refresh = () => {
+    fetch("../test.json")
+      .then((response) => response.json())
+      .then((data) => setElement(data))
+      .catch((err) => console.error(err))
+  }
+  const refreshAddElement = () => {
+    fetch("../addtest.json")
+      .then((response) => response.json())
+      .then((data) => setElement(data))
+      .catch((err) => console.error(err))
+  }
+
+  const testMoleculeGet = () =>{
+    fetch("../gettest.json", {method:"POST", 
+    headers: {"Content-type": "application/json"},
+    body: JSON.stringify({'id':'1', 'name':'Water'})
+    })
+    .then((response) => console.log(response))
+    .catch((err) => console.error(err))
+  }
+
+  useEffect(() =>{
+    refresh()
+  }, [])
+
+  if(!elements){
+    return (
+    <div className='ContactList'>
+      <p>Loading elements....</p>
+    </div>)
+  }
+
   return (
     <div className='ContactList'>
       <h1>Elements</h1>
-      {props.children}
-      <button onClick={FetchTest}>Test</button>
-      <button onClick={Refresh}>Refresh</button>
+      {elements.map((element, i) => (
+        <Element {...element} key={i}/>
+      ))}
+      <button onClick={refresh}>Refresh</button>
+      <button onClick={refreshAddElement}>Add Dez Nuts</button>
+      <button onClick={testMoleculeGet}>Test Get Molecule</button>
     </div>
   )
 }
@@ -71,7 +140,7 @@ function Element(props){
 /*function Molecule(props){
   return ()
 }*/
-
+/*
 function Contact(props){
   let names = props.name.split(' ')
   let initials = names.map(name => name[0].toUpperCase()).join('')
@@ -93,64 +162,21 @@ function Contact(props){
       </a>
     </div>
   );
-}
+}*/
 
 function App(props) {
-  return (
-   /* <ContactList>
-      {props.contacts.map((contact, i) => 
-        <Contact {...contact} key={i}/>
-      )}
-      <button onClick={update}>
-        Add
-      </button>
-    </ContactList>*/
-    <ElementList>
-      {props.elements.map((element, i) => 
-        <Element {...element} key={i}/>
-      )}
-    </ElementList>
+  return ( 
+    <div>
+    <ElementList> </ElementList>
+    <ElementForm></ElementForm>
+    </div>
   );
 }
 
 
-billionaires.forEach(element => {
-  console.log(element)
-});
-// Your React elements will go here.
-let elements = []
-billionaires.forEach((element, i) => {
-  let photo
-  if("photoURL" in element){
-    photo = <img src={element.photoURL}/>
-  }
-  let contact = <div className='Contact' key={i}>
-      <div className='Contact-avatar'>
-        {element.name.split(' ').map(s => s[0]).join('')}
-        {photo}
-      </div>
-      <span className='Contact-name'>{element.name}</span>
-      <a href={element.email}>
-        {element.email}
-      </a>
-    </div>
-  elements.push(contact)
-})
-
-function update(){
-  updatedContacts = updatedContacts.concat({
-    name: 'Myron Cringenko',
-    email: 'mladyjen@uoguelph.ca',
-  });
-  ReactDOM.render(
-    <App contacts={updatedContacts}/>,
-    document.getElementById('root')
-  )
-}
-
 // Use a for loop or array.map to build the elements array
 let updatedContacts = billionaires;
 ReactDOM.render(
-  <App elements={ListOfElements}/>,
+  <App/>,
   document.getElementById('root')
 )
