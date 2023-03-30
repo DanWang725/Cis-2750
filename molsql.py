@@ -110,14 +110,20 @@ class Database:
         for bond in bonds:
             mol.append_bond(bond[1], bond[2], bond[3])
         return mol
-    def getMolecules(self):
+    def load_allMol(self):
+        """
+        Returns a array of dictionaries for molecules. Includes database id, name, atoms, bonds
+        """
         mols = self.conn.execute("""
-            SELECT Molecules.NAME FROM Molecules;
+            SELECT Molecules.NAME, Molecules.MOLECULE_ID FROM Molecules;
         """).fetchall();
-        moleculeList = {};
-        for name in mols:
-            #print(name[0]);
-            moleculeList[name[0]] = self.load_mol(name[0]);
+        moleculeList = [];
+        for mol in mols:
+            molObj = self.load_mol(mol[0]);
+            moleculeList.append({'name': mol[0],
+                       'id': mol[1],
+                       'atom_count': molObj.atom_no,
+                       'bond_count': molObj.bond_no})
         return moleculeList;
     
     def radius(self):
@@ -148,9 +154,25 @@ class Database:
                 <stop offset="100%" stop-color="#{radius[3]}"/>
                 </radialGradient>""";
         return svgString
+    def getElementsJSON(self):
+        list = [];
+        elements = self.conn.execute(f"""SELECT Elements.ELEMENT_CODE, Elements.ELEMENT_NAME,Elements.COLOUR1, Elements.RADIUS FROM 
+                            Elements;""" ).fetchall();
+        for element in elements:
+            elementObj = {}
+            elementObj['code'] = element[0];
+            elementObj['name'] = element[1];
+            elementObj['colour'] = element[2];
+            elementObj['radius'] = element[3];
+            list.append(elementObj);
+        return list;
+    def deleteEntry(self, table, identifier, name):
+        self.conn.execute(f""" DELETE FROM {table} WHERE {identifier}='{name}';
+        """)
+        self.conn.commit();
 
 if __name__ == "__main__":
-    db = Database(reset=False);
+    db = Database(reset=True);
     db.create_tables();
     db['Elements'] = ( 1, 'H', 'Hydrogen', 'FFFFFF', '050505', '020202', 25 );
     db['Elements'] = ( 6, 'C', 'Carbon', '808080', '010101', '000000', 40 );
@@ -177,7 +199,7 @@ if __name__ == "__main__":
     MolDisplay.element_name = db.element_name();
     MolDisplay.header += db.radial_gradients();
     
-    molculeList = db.getMolecules();
+    molculeList = db.load_allMol();
     for name in molculeList:
         print(name);
     
