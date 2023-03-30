@@ -12,13 +12,21 @@ database = molsql.Database();
 class Handler(BaseHTTPRequestHandler):
   def do_GET(self):
     if self.path == "/":
+      f = open("src/index.html", "r")
+      css = ""
+      s = f.readline()
+      while s != "":
+        css += s
+        #print(s)
+        s = f.readline()
+      f.close()
       self.send_response( 200 ); # OK
 
       self.send_header( "Content-type", "text/html" );
-      self.send_header( "Content-length", len(inputForm) );
+      self.send_header( "Content-length", len(css) );
       self.end_headers();
 
-      self.wfile.write( bytes( inputForm, "utf-8" ) );
+      self.wfile.write( bytes( css, "utf-8" ) );
 
     else:
       sendReply = False
@@ -58,9 +66,9 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(bytes(css, "utf-8"))
         return
       
-      self.send_response( 404 );
+      self.send_response( 418 );
       self.end_headers();
-      self.wfile.write( bytes( "404: not found", "utf-8" ) );
+      self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
   
   def do_POST(self):
     if self.path == "/molecule":
@@ -87,43 +95,31 @@ class Handler(BaseHTTPRequestHandler):
     elif self.path.endswith(".json"):
       data = self.rfile.read(int(self.headers['Content-length']));
       gottenData = json.loads(data.decode('utf-8'));
+      if self.path == "/element.json":
+        database['Elements'] = ('NULL', gottenData['code'], gottenData['name'],
+                                gottenData['colour'], gottenData['colour'], gottenData['colour'],
+                                gottenData['radius']);
       print(gottenData);
+      self.send_response( 418 );
+      self.end_headers();
+      self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
+    else:
+      self.send_response( 418 );
+      self.end_headers();
+      self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
+  def do_DELETE(self):
+    if(self.path == "/element.json"):
       self.send_response( 404 );
       self.end_headers();
       self.wfile.write( bytes( "404: not found", "utf-8" ) );
     else:
-      self.send_response( 404 );
+      self.send_response( 418 );
       self.end_headers();
-      self.wfile.write( bytes( "404: not found", "utf-8" ) );
+      self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
+
 
 inputForm = """
-<html>
-  <head>
-    <title> File Upload </title>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="https://unpkg.com/react@latest/umd/react.development.js" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/react-dom@latest/umd/react-dom.development.js" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  </head>
-  <body>
-    
-      <div id="root"></div>
-    <script src="billionaires.js" data-plugins="transform-es2015-modules-umd" type="text/babel"></script>
-    <script src="index.js" data-plugins="transform-es2015-modules-umd" type="text/babel">
 
-    </script>
-    <h1> File Upload </h1>
-    <form action="molecule" enctype="multipart/form-data" method="post">
-      <p>
-        <input type="file" id="sdf_file" name="filename"/>
-      </p>
-      <p>
-        <input type="submit" value="Upload"/>
-      </p>
-    </form>
-  </body>
-</html>
 """;
 httpd = HTTPServer( ( 'localhost', int(sys.argv[1]) ), Handler );
 httpd.serve_forever();
