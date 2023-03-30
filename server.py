@@ -109,9 +109,19 @@ class Handler(BaseHTTPRequestHandler):
       self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
   def do_DELETE(self):
     if(self.path == "/element.json"):
-      self.send_response( 404 );
-      self.end_headers();
-      self.wfile.write( bytes( "404: not found", "utf-8" ) );
+      data = self.rfile.read(int(self.headers['Content-length']));
+      elementCode = data.decode('utf-8');
+      print(elementCode)
+      print(f"{elementCode}")
+      result, isDatabaseDestroyed = database.deleteEntry('Elements','ELEMENT_CODE',f"'{elementCode}'")
+      if(result):
+        self.send_response( 200 );
+        self.end_headers();
+        self.wfile.write( bytes( "Normal", "utf-8" ) );
+      else :
+        self.send_response( 404 );
+        self.end_headers();
+        self.wfile.write( bytes( "404: not found", "utf-8" ) );
     else:
       self.send_response( 418 );
       self.end_headers();

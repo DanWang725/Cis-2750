@@ -1,4 +1,4 @@
-import{ billionaires } from './billionaires'
+//import{ billionaires } from './billionaires'
 import { useState, useEffect} from 'React';
 //import ReactDOM from "https://cdn.skypack.dev/react-dom";
 /*
@@ -23,41 +23,63 @@ function Refresh(){
 
 
 function ElementForm(props){
-  let [data, setData] = useState({code:0, name:'', colour:'', radius:0})
+  let [data, setData] = useState({code:'', name:'', colour:'', radius:0})
   
   const SendData = () =>{
     console.log(data)
+    fetch("../element.json", {method:"POST", 
+    headers: {"Content-type": "application/json"},
+    body: JSON.stringify(data)
+    })
+    .then((response) => console.log(response))
+    .catch((err) => console.error(err))
   }
 
-  let handleChange = (evt)=> {
-    const value = evt.target.value;
+  const DeleteData = () =>{
+    console.log(data)
+    fetch("../element.json", {method:"DELETE", 
+    headers: {"Content-type": "text"},
+    body: data.code
+    })
+    .then((response) => console.log(response))
+    .catch((err) => console.error(err))
+  }
+
+  let handleChange = (name, value)=> {
     setData((data)=> {
       return({
         ...data,
-        [evt.target.name]: value
+        [name]: value
       });
     });
   }
 
 
   let elements = (<div>
-    <ElementInputForm type="number" name="code" inputValue={data.code} onInputValueChange={handleChange}/>
-    <ElementInputForm type="text" name="name" inputValue={data.name} onInputValueChange={handleChange}/>
-    <ElementInputForm type="text" name="colour" inputValue={data.colour} onInputValueChange={handleChange}/>
-    <ElementInputForm type="number" name="radius" inputValue={data.radius} onInputValueChange={handleChange}/>
+    <ElementInputForm type="text" name="code" inputValue={data} onInputValueChange={handleChange}/>
+    <ElementInputForm type="text" name="name" inputValue={data} onInputValueChange={handleChange}/>
+    <ElementInputForm type="text" name="colour" inputValue={data} onInputValueChange={handleChange}/>
+    <ElementInputForm type="number" name="radius" inputValue={data} onInputValueChange={handleChange}/>
     </div>)
   return (<div>
       <form>
         {elements}
       </form>
       <button onClick={SendData}>Add Element</button>
-    </div>)
-  
+      <button onClick={DeleteData}>Delete Element</button>
+    </div>
+  )
   
 }
 function ElementInputForm(props){
   return (<label>{props.name}
-    <input type={props.type} name={props.name} value={props.inputValue} onChange={(e)=>{props.onInputValueChange(e)}}></input>
+    <input type={props.type}
+      name={props.name}
+      value={props.inputValue[props.name]} 
+      onChange={(e)=>{
+        let val = props.type==="number" ? parseInt(e.target.value, 10) : e.target.value;
+        props.onInputValueChange(e.target.name, val)
+      }}></input>
   </label>);
 }
 
@@ -140,29 +162,6 @@ function Element(props){
 /*function Molecule(props){
   return ()
 }*/
-/*
-function Contact(props){
-  let names = props.name.split(' ')
-  let initials = names.map(name => name[0].toUpperCase()).join('')
-  let photo
-  if("photoURL" in props){
-    photo = <img src={props.photoURL}/>
-  }
-  return (
-    <div className='Contact' key={props.i}>
-      <div className='Contact-avatar'>
-        {initials}
-        {photo}
-      </div>
-      <span className='Contact-name'>
-        {props.name}
-      </span>
-      <a href={props.email}>
-        {props.email}
-      </a>
-    </div>
-  );
-}*/
 
 function App(props) {
   return ( 
@@ -175,8 +174,8 @@ function App(props) {
 
 
 // Use a for loop or array.map to build the elements array
-let updatedContacts = billionaires;
-ReactDOM.render(
-  <App/>,
-  document.getElementById('root')
+const root = ReactDOM.createRoot(document.getElementById('root'));
+
+root.render(
+  <App/>
 )
