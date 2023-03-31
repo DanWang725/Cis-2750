@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <title> File Upload </title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://unpkg.com/react@latest/umd/react.development.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/react-dom@latest/umd/react-dom.development.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    
+      <div id="root"></div>
+      <script src="Elements.js" data-presets="env,react" data-plugins="transform-modules-umd, transform-spread" type="text/babel"></script>
+    <script src="index.js" data-presets="env,react" data-plugins="transform-modules-umd, transform-spread" type="text/babel">
+
+    </script>
+    <h1> File Upload </h1>
+    <form action="molecule" enctype="multipart/form-data" method="post">
+      <p>
+        <input type="file" id="sdf_file" name="filename"/>
+      </p>
+      <p>
+        <input type="submit" value="Upload"/>
+      </p>
+    </form>
+  </body>
+</html>

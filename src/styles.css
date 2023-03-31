@@ -8,15 +8,39 @@ body {
     font-family: Lato, sans-serif;
     padding: 7px 15px 10px;
     overflow:hidden;
+    display: flex;
+    -webkit-animation: fadein .3s linear forwards;
+    animation: fadein .3s linear forwards;
+  }
+  @-webkit-keyframes fadein {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+      
+  @keyframes fadein {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
   }
 
   .ElementCode {
-    padding: 15px;
+    padding: 10px;
+    width: 32px;
+    height: 32px;
+    margin: 3px 7px 0 0;
+    text-align: center;
     position: relative;
-    float: left;
+    justify-content: left;
     font-size: x-large;
     font-weight: bold;
-    font-family:Arial, Helvetica, sans-serif
+    font-family:Arial, Helvetica, sans-serif;
+    border-radius: 10px;
+    border:2px solid black;
+  }
+  .ElementTextBox{
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    flex-direction: column;
   }
 
   .ElementName{
@@ -24,8 +48,26 @@ body {
     font-weight: bold;
   }
   .ElementInfo {
-    display: block;
     margin-top: 5px;
+  }
+
+  .Element-actions {
+    display: block;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-left: auto;
+    padding: 10px;
+    height:40%;
+    align-self: flex-end;
+  }
+
+  .Element-actions > button{
+    transition-duration: 0.2ms;
+  }
+
+  .Element-actions:hover{
+    background-color: crimson;
+    color:white;
   }
   
   .ContactList {
