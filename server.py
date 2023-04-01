@@ -1,6 +1,7 @@
 import sys;
 import io;
 import os
+import re
 import json
 import MolDisplay
 import molsql
@@ -9,6 +10,9 @@ from http.server import HTTPServer, BaseHTTPRequestHandler;
 # The port is 51584
 
 database = molsql.Database();
+MolDisplay.radius = database.radius();
+MolDisplay.element_name = database.element_name();
+MolDisplay.header += database.radial_gradients();
 class Handler(BaseHTTPRequestHandler):
   def do_GET(self):
     if self.path == "/":
@@ -41,14 +45,32 @@ class Handler(BaseHTTPRequestHandler):
       if self.path.endswith(".json"):
         mimetype = "application/json"
         sendReply = True
-
+      if self.path.endswith(".svg"):
+        mimetype = "image/svg+xml"
+        sendReply = True
       
       if sendReply == True:
         if self.path.endswith(".json"):
           #css = json.dumps(database.getElementsJSON(), indent=4)
           if self.path.endswith("addtest.json"):
             database['Elements'] = ( 2, 'D', 'Deez Nuts', 'FFFFFF', '050505', '020202', 25 );
-          css = json.dumps(database.getElementsJSON(), indent=4)
+          
+          if self.path == "/molecule.json":
+            css = json.dumps(database.load_allMol(), indent=4)
+          else:
+            css = json.dumps(database.getElementsJSON(), indent=4)
+        elif self.path.endswith(".svg"):
+          molecule = re.search('[ \w-]+?(?=\.)', self.path)
+          print("Trying to find molecule " + molecule[0])
+          loadedMol = database.load_mol(molecule[0])
+          if loadedMol.atom_no == 0:
+            self.send_response( 404 );
+            self.end_headers();
+            self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
+            return
+          
+          css = loadedMol.svg()
+          
         else:
           f = open("src"+self.path, "r")
           css = ""
@@ -60,6 +82,7 @@ class Handler(BaseHTTPRequestHandler):
           f.close()
 
         self.send_response(200)
+        #print(css)
         self.send_header("Content-type",mimetype)
         self.send_header( "Content-length", len(css) );
         self.end_headers()
@@ -71,7 +94,7 @@ class Handler(BaseHTTPRequestHandler):
       self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
   
   def do_POST(self):
-    if self.path == "/molecule":
+    if self.path == "/molecule/upload":
       self.send_response( 200 ); # OK
       
       #send rfile to an iowrapper
@@ -95,7 +118,7 @@ class Handler(BaseHTTPRequestHandler):
     elif self.path.endswith(".json"):
       data = self.rfile.read(int(self.headers['Content-length']));
       gottenData = json.loads(data.decode('utf-8'));
-      if self.path == "/element.json":
+      if self.path == "/upload/element.json":
         database['Elements'] = ('NULL', gottenData['code'], gottenData['name'],
                                 gottenData['colour'], gottenData['colour'], gottenData['colour'],
                                 gottenData['radius']);

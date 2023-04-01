@@ -1,6 +1,8 @@
 //import{ billionaires } from './billionaires'
 import { useState, useEffect} from 'React';
 import { Element, ElementList } from './Elements';
+//import SVG from 'React-inlinesvg';
+
 //import ReactDOM from "https://cdn.skypack.dev/react-dom";
 /*
 function ContactList(props){
@@ -57,16 +59,47 @@ function MoleculeList(props){
       <MoleculeInformation {...molecules} key={i}></MoleculeInformation>
     ))}
     <button onClick={()=>FetchMolecules()}>Refresh</button>
+    <MoleculeDisplay name='Water'></MoleculeDisplay>
   </div>)
 }
 function MoleculeInformation(props){
+  const[show, setShow] = useState(false);
+  const clickyClicky = () =>{
+    setShow(true)
+  }
   console.log(props)
+
   return (<div key={props.i}>
     <p>{props.name}</p>
     <span>id: {props.id}</span>
     <span>Atoms No: {props.atom_count}</span>
     <span>Bond No: {props.bond_count}</span>
+
+    <button onClick={clickyClicky}>
+      Show Me
+    </button>
+    {show ? <MoleculeDisplay name={props.name}></MoleculeDisplay> : null}
+
   </div>)
+}
+/*
+const svgWrapper = (svg) => {
+  const svgWrapperRef = React.useRef();
+  React.useEffect(() => {
+    svgWrapperRef.current.innerHTML = svg;
+  }, [])
+  return {
+    svgWrapperRef
+  }
+}*/
+
+function MoleculeDisplay(props){
+
+
+  return (<div >
+    <img src={"../molecule/"+ props.name +".svg"} style={{ height: 250, width: 250 }}/>
+  </div>)
+
 }
 
 function App(props) {
