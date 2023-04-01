@@ -1,5 +1,5 @@
 //import{ billionaires } from './billionaires'
-import { useState, useEffect} from 'React';
+import { useState, useEffect, createRef} from 'React';
 import { Element, ElementList } from './Elements';
 //import SVG from 'React-inlinesvg';
 
@@ -54,13 +54,14 @@ function MoleculeList(props){
   },[])
 
   return (<div className='Molecule'>
-    <p>Molecules in Database</p>
+    <p className='gradient-bottom'>Molecules in Database</p>
     <div className='MoleculeList'>
     {molecule.map((molecules, i) => (
       <MoleculeInformation {...molecules} key={i}></MoleculeInformation>
     ))}
     </div>
     <button onClick={()=>FetchMolecules()}>Refresh</button>
+    <MoleculeUpload></MoleculeUpload>
   </div>)
 }
 function MoleculeInformation(props){
@@ -84,24 +85,54 @@ function MoleculeInformation(props){
 
   </div>)
 }
-/*
-const svgWrapper = (svg) => {
-  const svgWrapperRef = React.useRef();
-  React.useEffect(() => {
-    svgWrapperRef.current.innerHTML = svg;
-  }, [])
-  return {
-    svgWrapperRef
-  }
-}*/
+
 
 function MoleculeDisplay(props){
-
-
   return (<div >
     <img src={"../molecule/"+ props.name +".svg"} style={{ height: 250, width: 250 }}/>
   </div>)
+}
 
+function MoleculeUpload(props){
+  const [file, setFile] = useState();
+  const [name, setName] = useState('');
+
+  function handleSubmit(event) {
+    event.preventDefault()
+    if (name === '' || !file){
+      return;
+    }
+    const form = event.target;
+
+    /*const name1 = form.querySelector('input[name="name"]').value;
+    const fileInput = form.querySelector('input[type="file"]');
+    const file1 = fileInput.files[0];*/
+    let formData = new FormData();
+    formData.append('file', file)
+
+    console.log(formData)
+
+    fetch("../molecule/"+ name +".sdf", {method:"POST", 
+      body: formData
+      })
+      .then((response) => console.log(response))
+      .catch((err) => console.error(err))
+      console.log(file)
+  }
+  const handleFileChange = (e) => {
+    if (e.target.files) {
+      setFile(e.target.files[0]);
+    }
+  };
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input type="text" value={name} onChange={(e)=>setName(e.target.value)}></input>
+        <input type="file" onChange={handleFileChange}></input>
+        <button type="submit">Upload</button> 
+      </form>
+    </div>
+  )
 }
 
 function App(props) {
