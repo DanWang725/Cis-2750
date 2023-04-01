@@ -70,6 +70,27 @@ body {
     color:white;
   }
   
+  .Molecule {
+    background-color: #f0f4fc;
+    box-shadow:
+      1px 1px 3px rgba(0, 0, 0, 0.05),
+      4px 4px 8px rgba(0, 0, 0, 0.02);
+    position: relative;
+
+  }
+  .MoleculeList{
+    display: flex;
+  }
+
+  .MoleculeCard {
+    border-radius: 1%;
+    background-color:#f4f8ff;
+    border-bottom: 2px solid black;
+    border-right: 1px solid black;
+    flex-direction: column;
+    padding: 10px;
+  }
+
   .ContactList {
     background-color: white;
     box-shadow:

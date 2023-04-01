@@ -53,32 +53,34 @@ function MoleculeList(props){
     FetchMolecules()
   },[])
 
-  return (<div>
+  return (<div className='Molecule'>
     <p>Molecules in Database</p>
+    <div className='MoleculeList'>
     {molecule.map((molecules, i) => (
       <MoleculeInformation {...molecules} key={i}></MoleculeInformation>
     ))}
+    </div>
     <button onClick={()=>FetchMolecules()}>Refresh</button>
-    <MoleculeDisplay name='Water'></MoleculeDisplay>
   </div>)
 }
 function MoleculeInformation(props){
   const[show, setShow] = useState(false);
   const clickyClicky = () =>{
-    setShow(true)
+    setShow(!show)
   }
   console.log(props)
+  const display = (<MoleculeDisplay name={props.name}></MoleculeDisplay>)
 
-  return (<div key={props.i}>
+  return (<div key={props.i} className='MoleculeCard'>
     <p>{props.name}</p>
-    <span>id: {props.id}</span>
-    <span>Atoms No: {props.atom_count}</span>
-    <span>Bond No: {props.bond_count}</span>
+    <p>id: {props.id}</p>
+    <p>Atoms No: {props.atom_count}</p>
+    <p>Bond No: {props.bond_count}</p>
 
     <button onClick={clickyClicky}>
-      Show Me
+      {show ? "Hide" : "Show"}
     </button>
-    {show ? <MoleculeDisplay name={props.name}></MoleculeDisplay> : null}
+    {show ? display : null}
 
   </div>)
 }
