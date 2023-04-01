@@ -5,6 +5,7 @@ import re
 import json
 import MolDisplay
 import molsql
+import random
 from http.server import HTTPServer, BaseHTTPRequestHandler;
 
 # The port is 51584
@@ -62,7 +63,10 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path.endswith(".svg"):
           molecule = re.search('[ \w-]+?(?=\.)', self.path)
           print("Trying to find molecule " + molecule[0])
-          loadedMol = database.load_mol(molecule[0])
+          if(molecule[0] == "hp"):
+            loadedMol = database.load_mol(random.choice( database.load_allMol())['name'])
+          else:
+            loadedMol = database.load_mol(molecule[0])
           if loadedMol.atom_no == 0:
             self.send_response( 404 );
             self.end_headers();

@@ -1,6 +1,8 @@
 //import{ billionaires } from './billionaires'
 import { useState, useEffect, createRef} from 'React';
 import { Element, ElementList } from './Elements';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 //import SVG from 'React-inlinesvg';
 
 //import ReactDOM from "https://cdn.skypack.dev/react-dom";
@@ -12,9 +14,6 @@ function ContactList(props){
       {props.children}
     </div>
   );
-}
-function FetchTest(){
-  
 }*/
 
 function Refresh(){
@@ -89,7 +88,7 @@ function MoleculeInformation(props){
 
 function MoleculeDisplay(props){
   return (<div >
-    <img src={"../molecule/"+ props.name +".svg"} style={{ height: 250, width: 250 }}/>
+    <img src={"../molecule/"+ props.name +".svg"} style={{ height: 'auto', width: 250 }}/>
   </div>)
 }
 
@@ -153,11 +152,35 @@ function MoleculeUpload(props){
   )
 }
 
+function Navbar(props){
+
+}
+
 function App(props) {
+  let [view, setView] = useState('main');
+  const elementList = (<ElementList> </ElementList>);
+  const moleculeList = (<MoleculeList> </MoleculeList>);
+  const mainMenu = (<div className='Homepage'>  
+    <p>Molecule Viewer</p>
+    
+  </div>)
+
+  const showMolecules = ()=>{
+    setView('molecules')
+  }
+
+  const showElements = ()=>{setView('elements');}
+  const showMain = ()=>{setView('main');}
+
   return ( 
-    <div>
-    <ElementList> </ElementList>
-    <MoleculeList></MoleculeList>
+    <div className='mol-background fill-space'>
+      <button onClick={()=>showMolecules()}>Molecules</button>
+      <button onClick={()=>showElements()}>Elements</button>
+      <button onClick={()=>showMain()}>Back</button> 
+      {view === 'main' && mainMenu}
+      {view === 'molecules' && moleculeList}
+      {view === 'elements' && elementList}
+
     </div>
   );
 }

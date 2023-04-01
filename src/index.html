@@ -6,25 +6,17 @@
     <script src="https://unpkg.com/react-dom@latest/umd/react-dom.development.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-inlinesvg/0.8.0/react-inlinesvg.min.js" crossorigin="anonymous"></script>
-    
+    <script src='https://unpkg.com/react-router-dom@5.0.0/umd/react-router-dom.min.js'></script>
 
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   </head>
-  <body>
+  <body class="fill-space">
     
-      <div id="root"></div>
+      <div id="root" class="fill-space"></div>
       <script src="Elements.js" data-presets="env,react" data-plugins="transform-modules-umd, transform-spread" type="text/babel"></script>
     <script src="index.js" data-presets="env,react" data-plugins="transform-modules-umd, transform-spread" type="text/babel">
 
     </script>
-    <h1> File Upload </h1>
-    <form action="molecule" enctype="multipart/form-data" method="post">
-      <p>
-        <input type="file" id="sdf_file" name="filename"/>
-      </p>
-      <p>
-        <input type="submit" value="Upload"/>
-      </p>
-    </form>
+
   </body>
 </html>

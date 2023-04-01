@@ -1,10 +1,10 @@
 import molecule
 import math
-header = """<svg version="1.1" width="1000" height="1000" 
+header = """<svg version="1.1" width="{x:d}" height="{y:d}"
  xmlns="http://www.w3.org/2000/svg">""";
 footer = """</svg>""";
-offsetx = 500;
-offsety = 500;
+offsetx = 1000;
+offsety = 1000;
 
 class Atom:
     """
@@ -133,7 +133,23 @@ class Molecule(molecule.molecule):
         """
         atomIdx = 0
         bondIdx = 0
-        svgString = header
+        
+        statsX = {'max':0.0,'min':0.0}
+        statsY = {'max':0.0, 'min':0.0}
+        for a in range(self.atom_no):
+            atom = Atom(self.get_atom(a));
+            statsX['max'] = max(statsX['max'], atom.atom.x)
+            statsY['max'] = max(statsY['max'], atom.atom.y)
+            statsX['min'] = min(statsX['min'], atom.atom.x)
+            statsY['min'] = min(statsY['min'], atom.atom.y)
+
+        height = math.ceil(statsY['max']-statsY['min'])*100 + 300
+        width = math.ceil(statsX['max']-statsX['min'])*100 + 300
+        global offsetx, offsety
+        offsetx = math.ceil((width-150)/2)
+        offsety = math.ceil((height-150)/2)
+        print(f"offsetx {offsetx} offsety {offsety}")
+        svgString = header.format(x=width, y=height)
 
         # adding the svg based on z values
         while atomIdx < self.atom_no or bondIdx < self.bond_no:
