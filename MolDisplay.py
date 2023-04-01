@@ -187,6 +187,42 @@ class Molecule(molecule.molecule):
             bond = file.readline().split()
             self.append_bond(int(bond[0])-1, int(bond[1])-1, (int)(bond[2]))
         file.close()
+
+        
+    def parseString(self,stringMol):
+        """
+        parses a textiowrapper and imports an sdf file
+        """
+        strPieces = stringMol.split('\n');
+        counter = 3
+        # print(next(itr))
+        # print(next(itr))
+        # print(next(itr))
+
+        #remove first 3 lines
+        # file.readline() #the header molecule name
+        # file.readline()
+        # file.readline()
+        
+        #read line, split by spaces
+        stats = strPieces[counter].split();
+        counter += 1
+        print(stats)
+        numAtoms = int(stats[0]) #first number is number of atoms
+        numBonds = int(stats[1]) #second number is number of bonds
+        print(f"""atoms: {numAtoms} bonds: {numBonds}""")
+
+        #read numAtoms lines and parse as atoms
+        for n in range(numAtoms):
+            atom = strPieces[counter].split()
+            counter+=1
+            self.append_atom(str(atom[3]), float(atom[0]), float(atom[1]), float(atom[2]))
+        
+        #read numBonds lines parse as bonds
+        for n in range(numBonds):
+            bond = strPieces[counter].split()
+            counter+=1
+            self.append_bond(int(bond[0])-1, int(bond[1])-1, (int)(bond[2]))
     
 if __name__ == "__main__":
     mol = Molecule()

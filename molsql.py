@@ -84,15 +84,36 @@ class Database:
                         VALUES ({moleculeRow[0][0]}, {bondId});  """);
     
     def add_molecule(self, name, fp):
-        mol = MolDisplay.Molecule()
-        mol.parse(fp);
-        self.conn.execute(f"""INSERT OR IGNORE INTO Molecules(NAME)
-                    VALUES ('{name}');""");
-        for x in range(mol.atom_no):
-            self.add_atom(name, mol.get_atom(x));
-        for x in range(mol.bond_no):
-            self.add_bond(name, mol.get_bond(x));
-        self.conn.commit();
+        try:
+            mol = MolDisplay.Molecule()
+            mol.parse(fp);
+            self.conn.execute(f"""INSERT OR IGNORE INTO Molecules(NAME)
+                        VALUES ('{name}');""");
+            for x in range(mol.atom_no):
+                self.add_atom(name, mol.get_atom(x));
+            for x in range(mol.bond_no):
+                self.add_bond(name, mol.get_bond(x));
+            self.conn.commit();
+            return True
+        except:
+            self.conn.rollback();
+            return False
+    def add_molecule_str(self, name, molStr):
+        try:
+            mol = MolDisplay.Molecule()
+            mol.parseString(molStr);
+            self.conn.execute(f"""INSERT OR IGNORE INTO Molecules(NAME)
+                        VALUES ('{name}');""");
+            for x in range(mol.atom_no):
+                self.add_atom(name, mol.get_atom(x));
+            for x in range(mol.bond_no):
+                self.add_bond(name, mol.get_bond(x));
+            self.conn.commit();
+            return True
+        except Exception as e:
+            print(e)
+            self.conn.rollback();
+            return False
     
     def load_mol(self, name):
         mol = MolDisplay.Molecule();
@@ -109,6 +130,7 @@ class Database:
                             WHERE Molecules.NAME='{name}';""" ).fetchall();
         for bond in bonds:
             mol.append_bond(bond[1], bond[2], bond[3])
+        mol.sort()
         return mol
     def load_allMol(self):
         """
@@ -130,6 +152,7 @@ class Database:
         elements = self.conn.execute(f"""SELECT Elements.ELEMENT_CODE, Elements.RADIUS FROM 
                             Elements;""" ).fetchall();
         newDict = {}
+        print(elements)
         for radius in elements:
             newDict[radius[0]] = radius[1]
         return newDict
@@ -146,6 +169,7 @@ class Database:
         elements = self.conn.execute(f"""SELECT Elements.ELEMENT_NAME, Elements.COLOUR1,Elements.COLOUR2,Elements.COLOUR3 FROM 
                             Elements;""" ).fetchall();
         svgString = ""
+        print(elements)
         for radius in elements:
             svgString+= f"""
                 <radialGradient id="{radius[0]}" cx="-50%" cy="-50%" r="220%" fx="20%" fy="20%">
@@ -153,6 +177,7 @@ class Database:
                 <stop offset="50%" stop-color="#{radius[2]}"/>
                 <stop offset="100%" stop-color="#{radius[3]}"/>
                 </radialGradient>""";
+        
         return svgString
     def getElementsJSON(self):
         list = [];
@@ -167,9 +192,17 @@ class Database:
             list.append(elementObj);
         return list;
     def deleteEntry(self, table, identifier, name):
-        self.conn.execute(f""" DELETE FROM {table} WHERE {identifier}='{name}';
-        """)
+        print("WE HAVE DELETED SOMETIHNG")
+        count = self.conn.execute(f""" SELECT COUNT(*) FROM {table} WHERE {identifier}={name};""").fetchone();
+        if(count == 0):
+            return False, True
+        self.conn.execute(f""" DELETE FROM {table} WHERE {identifier}={name};""")
+        count = self.conn.execute(f""" SELECT COUNT(*) FROM {table} WHERE {identifier}={name};""").fetchone();
         self.conn.commit();
+        if(count == 0):
+            return True, True
+        else:
+            return False, False
 
 if __name__ == "__main__":
     db = Database(reset=True);
@@ -202,6 +235,7 @@ if __name__ == "__main__":
     molculeList = db.load_allMol();
     for name in molculeList:
         print(name);
+    #db.deleteEntry('Elements','ELEMENT_CODE',"'H'")
     
     # for molecule in ['Water', 'Caffeine', 'Isopentanol' , 'Romanium']: #'Water', 'Caffeine', 'Isopentanol' , 
     #     mol = db.load_mol( molecule );

@@ -96,29 +96,47 @@ function MoleculeDisplay(props){
 function MoleculeUpload(props){
   const [file, setFile] = useState();
   const [name, setName] = useState('');
+  let fileReader;
 
   function handleSubmit(event) {
     event.preventDefault()
+
+    fileReader = new FileReader();
+    fileReader.onloadend = uploadFile
+    fileReader.readAsText(file);
+  }
+
+  const uploadFile = (e)=>{
+    let dataPackage = {data : fileReader.result, name:name}
+    
+    //console.log(dataPackage)
+    fetch("../molecule/"+ name +".sdf", {method:"POST", 
+        headers: {"Content-type": "application/json"},
+        body: JSON.stringify(dataPackage)
+      })
+      .then((response) => console.log(response))
+      .catch((err) => console.error(err))
+      console.log(file)
+      
+  }
+
+  
+/*
+  function handleSubmit(event) {
     if (name === '' || !file){
       return;
     }
     const form = event.target;
 
-    /*const name1 = form.querySelector('input[name="name"]').value;
+    const name1 = form.querySelector('input[name="name"]').value;
     const fileInput = form.querySelector('input[type="file"]');
-    const file1 = fileInput.files[0];*/
+    const file1 = fileInput.files[0];
     let formData = new FormData();
     formData.append('file', file)
 
     console.log(formData)
-
-    fetch("../molecule/"+ name +".sdf", {method:"POST", 
-      body: formData
-      })
-      .then((response) => console.log(response))
-      .catch((err) => console.error(err))
-      console.log(file)
-  }
+    
+  }*/
   const handleFileChange = (e) => {
     if (e.target.files) {
       setFile(e.target.files[0]);

@@ -69,7 +69,7 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
             return
           
-          css = loadedMol.svg()
+          css = loadedMol.svg(nightmare=True)
           
         else:
           f = open("src"+self.path, "r")
@@ -81,8 +81,8 @@ class Handler(BaseHTTPRequestHandler):
             s = f.readline()
           f.close()
 
-        self.send_response(200)
         #print(css)
+        self.send_response(200)
         self.send_header("Content-type",mimetype)
         self.send_header( "Content-length", len(css) );
         self.end_headers()
@@ -94,27 +94,36 @@ class Handler(BaseHTTPRequestHandler):
       self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
   
   def do_POST(self):
-    if self.path == "/molecule/upload":
-      self.send_response( 200 ); # OK
+    if self.path.endswith(".sdf"):
+      data = self.rfile.read(int(self.headers['Content-length']));
+      gottenData = json.loads(data.decode('utf-8'));
+      print(gottenData)
+
       
       #send rfile to an iowrapper
-      sdfFile = io.TextIOWrapper(self.rfile, 'utf-8', newline = '')
-      mol = MolDisplay.Molecule();
-
-      #remove header information
-      for x in range(4):
-        sdfFile.readline();
       
-      #parse file
-      mol.parse(sdfFile);
-      mol.sort();
-      svgString = mol.svg()
+      # print(gottenData['name'])
+      # print(gottenData['data'])
+        
+        #print("ENDLLINE")
+      if not database.add_molecule_str(gottenData['name'], gottenData['data']):
+        self.send_response( 415 ); # OK
+        self.end_headers()
 
-      self.send_header( "Content-type", "image/svg+xml" );
-      self.send_header( "Content-length", len(svgString) );
+      self.send_response( 200 ); # OK
+      # mol = MolDisplay.Molecule();
+
+      # #remove header information
+      # for x in range(4):
+      #   sdfFile.readline();
+      
+      # #parse file
+      # mol.parse(sdfFile);
+      # mol.sort();
+      #svgString = mol.svg()
+
       self.end_headers();
 
-      self.wfile.write( bytes( svgString, "utf-8" ) );
     elif self.path.endswith(".json"):
       data = self.rfile.read(int(self.headers['Content-length']));
       gottenData = json.loads(data.decode('utf-8'));
@@ -122,7 +131,7 @@ class Handler(BaseHTTPRequestHandler):
         database['Elements'] = ('NULL', gottenData['code'], gottenData['name'],
                                 gottenData['colour'], gottenData['colour'], gottenData['colour'],
                                 gottenData['radius']);
-      print(gottenData);
+      #print(gottenData);
       self.send_response( 418 );
       self.end_headers();
       self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
