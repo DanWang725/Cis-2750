@@ -17,12 +17,12 @@ export function MoleculeList(props){
     },[])
   
     if(molecule.length === 0){
-      return (<div className='Molecule'>
+      return (<div className='Molecule Page-content '>
         <p>Loading Molecules...</p>
       </div>)
     }
   
-    return (<div className='Molecule Page-content'>
+    return (<div className='Molecule middle-margins content-page'>
       <p className='gradient-bottom'>Molecules in Database</p>
       <div className='MoleculeList'>
       {molecule.map((molecules, i) => (
@@ -50,6 +50,7 @@ export function MoleculeList(props){
         <p>{props.name}</p>
         <p>id: {props.id}</p>
         <p>Atoms No: {props.atom_count}</p>
+        <p>Bond No: {props.bond_count}</p>
         <Link to={{
             pathname: '/molecule/view',
             state: { molecule : props.name } // you can pass svetsko here
@@ -80,7 +81,7 @@ export function MoleculeList(props){
     </span>)
   }
   
-  function MoleculeUpload(props){
+  export function MoleculeUpload(props){
     const [file, setFile] = useState();
     const [name, setName] = useState('');
     let fileReader;
@@ -124,19 +125,25 @@ export function MoleculeList(props){
   }
 
   export function MoleculeView(props){
-    const [image, setImage] = useState('')
-
-    useEffect(()=>{
-        setImage("../molecule/"+ prop.state.molecule +".svg")
-      }, [])
 
     const Link = ReactRouterDOM.Link;
 
     const location = ReactRouterDOM.useLocation();
     const prop = {...location}
     console.log(prop.state)
-    return (<div>
-        {image !== '' ? <img src={image} style={{ height: '200px', width: 'auto'}} alt="preview"/> : <h1>Loading Preview....</h1>}
+    if(prop.state === undefined){
+        return (<div className='middle-margins content-page'>
+            <h1>Error - Attempted to access data without request</h1>
+            <Link to={{
+            pathname: '/molecule' // you can pass svetsko here
+            }}>
+            <button className='MoleculeCard-action'>Back</button>
+        </Link>
+        </div>)
+    }
+    return (<div className='middle-margins content-page Molecule-view'>
+        <h1>{prop.state.molecule}</h1>
+        <img src={"../molecule/"+ prop.state.molecule +".svg"} style={{ height: '100%', width: 'auto'}} alt="preview"/>
         <Link to={{
             pathname: '/molecule' // you can pass svetsko here
         }}>

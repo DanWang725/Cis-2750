@@ -46,9 +46,20 @@ body {
     font-size: 75;
   }
 
-  .Page-content{
+  .middle-margins{
     display: flexbox;
     margin: 20px 50px;
+  }
+
+  
+  .content-page{
+    background-color: white;
+    box-shadow:
+      1px 1px 3px rgba(0, 0, 0, 0.05),
+      4px 4px 8px rgba(0, 0, 0, 0.02);
+    border-radius: 2px;
+    position: relative;
+    padding: 20px;
   }
 
   .Element{
@@ -262,6 +273,18 @@ body {
   .fill-space {
     height: 100%;
     width: auto;
+  }
+
+  .Molecule-view{
+    overflow: hidden;
+    align-items: center;
+    height: 80%;
+  }
+
+  .Molecule-view > img{
+    overflow: auto;
+    overflow-clip-margin: none;
+    float: right;
   }
 
   .ContactList {
