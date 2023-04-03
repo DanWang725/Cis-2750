@@ -42,13 +42,13 @@ export function ElementList(props){
   
     if(!elements){
       return (
-      <div className='ContactList'>
+      <div className='ContactList Page-content'>
         <p>Loading elements....</p>
       </div>)
     }
   
     return (
-      <div className='ContactList'>
+      <div className='ContactList Page-content'>
         <h1>Elements</h1>
         {elements.map((element, i) => (
           <Element {...element} key={i} testDataThing={FetchDeleteElement}/>

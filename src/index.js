@@ -1,8 +1,8 @@
 //import{ billionaires } from './billionaires'
 import { useState, useEffect, createRef} from 'React';
 import { Element, ElementList } from './Elements';
-import { MoleculeList } from './Molecules';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { MoleculeList, MoleculeView} from './Molecules';
+import {Route,NavLink, HashRouter} from 'react-router-dom';
 
 //import SVG from 'React-inlinesvg';
 
@@ -22,38 +22,58 @@ function Refresh(){
     <App/>
   );
 }
-
-
-function Navbar(props){
-
+function Homepage(props){
+  return (<div className='Homepage'>
+    <h1>Molecule Viewer</h1>
+    <h2>by Daniel Wang</h2>
+  </div>)
 }
 
 function App(props) {
-  let [view, setView] = useState('main');
-  const elementList = (<ElementList> </ElementList>);
-  const moleculeList = (<MoleculeList> </MoleculeList>);
-  const mainMenu = (<div className='Homepage'>
-    <p>Molecule Viewer</p>
+
+  // let [view, setView] = useState('main');
+  // const elementList = (<ElementList> </ElementList>);
+  // const moleculeList = (<MoleculeList> </MoleculeList>);
+  const NavLink = ReactRouterDOM.NavLink;
+  const Route = ReactRouterDOM.Route;
+  
+  // const showMolecules = ()=>{
+    //   setView('molecules')
+    // }
     
-  </div>)
-
-  const showMolecules = ()=>{
-    setView('molecules')
-  }
-
-  const showElements = ()=>{setView('elements');}
-  const showMain = ()=>{setView('main');}
-
-  return ( 
+    // const showElements = ()=>{setView('elements');}
+    // const showMain = ()=>{setView('main');}
+    const mainMenu =()=> (<Homepage></Homepage>)
+  const molecule = () => (<MoleculeList></MoleculeList>)
+  const element = () => (<ElementList></ElementList>)
+  const moleculeView = ()=>( <MoleculeView></MoleculeView>)
+  return (
+    <ReactRouterDOM.HashRouter> 
     <div className='mol-background fill-space'>
-      <button onClick={()=>showMolecules()}>Molecules</button>
+      <ul className='Navbar'>
+        <li>
+          <NavLink to='/' exact={true} className='Navbar-link' activeClassName="Navbar-active">Home</NavLink>
+        </li>
+        <li>
+          <NavLink to='/molecule'className='Navbar-link' activeClassName="Navbar-active">molecule</NavLink>
+        </li>
+        <li>
+          <NavLink to='/element'className='Navbar-link' activeClassName="Navbar-active">element</NavLink>
+        </li>
+      </ul>
+        <Route path='/' exact component={mainMenu}></Route>  
+        <Route path='/molecule' exact component={molecule}></Route>  
+        <Route path='/molecule/view' component={moleculeView}></Route>  
+        <Route path='/element' component={element}></Route>  
+      {/* <button onClick={()=>showMolecules()}>Molecules</button>
       <button onClick={()=>showElements()}>Elements</button>
       <button onClick={()=>showMain()}>Back</button> 
       {view === 'main' && mainMenu}
       {view === 'molecules' && moleculeList}
-      {view === 'elements' && elementList}
+      {view === 'elements' && elementList} */}
 
     </div>
+    </ReactRouterDOM.HashRouter>
   );
 }
 

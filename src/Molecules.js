@@ -1,5 +1,5 @@
 import { useState, useEffect, createRef} from 'React';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
 
 export function MoleculeList(props){
     let [molecule, setMolecule] = useState([]);
@@ -22,7 +22,7 @@ export function MoleculeList(props){
       </div>)
     }
   
-    return (<div className='Molecule'>
+    return (<div className='Molecule Page-content'>
       <p className='gradient-bottom'>Molecules in Database</p>
       <div className='MoleculeList'>
       {molecule.map((molecules, i) => (
@@ -35,10 +35,13 @@ export function MoleculeList(props){
   }
   function MoleculeInformation(props){
     const[show, setShow] = useState(false);
+    const Link = ReactRouterDOM.Link;
+
     const clickyClicky = () =>{
       setShow(!show)
     }
     console.log(props)
+    
     const display = (<MoleculeDisplay name={props.name}></MoleculeDisplay>)
   
     return (<div key={props.i} className='MoleculeCard MoleculeCard-Front'>
@@ -47,11 +50,12 @@ export function MoleculeList(props){
         <p>{props.name}</p>
         <p>id: {props.id}</p>
         <p>Atoms No: {props.atom_count}</p>
-        <p>Bond No: {props.bond_count}</p>
-  
-        <button className='MoleculeCard-action' onClick={clickyClicky}>
-          {show ? "Hide" : "Show"}
-        </button>
+        <Link to={{
+            pathname: '/molecule/view',
+            state: { molecule : props.name } // you can pass svetsko here
+        }}>
+            <button className='MoleculeCard-action'>Show</button>
+        </Link>
       </div>
     </div>)
   }
@@ -117,4 +121,26 @@ export function MoleculeList(props){
         </form>
       </div>
     )
+  }
+
+  export function MoleculeView(props){
+    const [image, setImage] = useState('')
+
+    useEffect(()=>{
+        setImage("../molecule/"+ prop.state.molecule +".svg")
+      }, [])
+
+    const Link = ReactRouterDOM.Link;
+
+    const location = ReactRouterDOM.useLocation();
+    const prop = {...location}
+    console.log(prop.state)
+    return (<div>
+        {image !== '' ? <img src={image} style={{ height: '200px', width: 'auto'}} alt="preview"/> : <h1>Loading Preview....</h1>}
+        <Link to={{
+            pathname: '/molecule' // you can pass svetsko here
+        }}>
+            <button className='MoleculeCard-action'>Back</button>
+        </Link>
+    </div>)
   }
