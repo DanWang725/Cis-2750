@@ -71,25 +71,26 @@ function MoleculeInformation(props){
   console.log(props)
   const display = (<MoleculeDisplay name={props.name}></MoleculeDisplay>)
 
-  return (<div key={props.i} className='MoleculeCard'>
-    <p>{props.name}</p>
-    <p>id: {props.id}</p>
-    <p>Atoms No: {props.atom_count}</p>
-    <p>Bond No: {props.bond_count}</p>
+  return (<div key={props.i} className='MoleculeCard MoleculeCard-Front'>
+    <div className="MoleculeCard-Wrapper">
+      {show ? display : null}
+      <p>{props.name}</p>
+      <p>id: {props.id}</p>
+      <p>Atoms No: {props.atom_count}</p>
+      <p>Bond No: {props.bond_count}</p>
 
-    <button onClick={clickyClicky}>
-      {show ? "Hide" : "Show"}
-    </button>
-    {show ? display : null}
-
+      <button onClick={clickyClicky}>
+        {show ? "Hide" : "Show"}
+      </button>
+    </div>
   </div>)
 }
 
 
 function MoleculeDisplay(props){
-  return (<div >
-    <img src={"../molecule/"+ props.name +".svg"} style={{ height: 'auto', width: 250 }}/>
-  </div>)
+  return (<span className='MoleculeCardPreview'>
+    <img src={"../molecule/"+ props.name +".svg"} style={{ height: 'auto', width: '100%'}}/>
+  </span>)
 }
 
 function MoleculeUpload(props){
@@ -160,7 +161,7 @@ function App(props) {
   let [view, setView] = useState('main');
   const elementList = (<ElementList> </ElementList>);
   const moleculeList = (<MoleculeList> </MoleculeList>);
-  const mainMenu = (<div className='Homepage'>  
+  const mainMenu = (<div className='Homepage'>
     <p>Molecule Viewer</p>
     
   </div>)
