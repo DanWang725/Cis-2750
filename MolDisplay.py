@@ -16,8 +16,18 @@ class Atom:
     def __str__(self):
         return 'Atom: '+  str(self.atom.element) +' '+ str(self.atom.x) +' '+ str(self.atom.y) +' '+ str(self.z);
     def svg(self):
+        if self.atom.element in radius:
+            rad = radius[self.atom.element];
+        else:
+            rad = 40
+            print("can't find", self.atom.element)
+
+        if self.atom.element in element_name:
+            fill = element_name[self.atom.element]
+        else:
+            fill= 'default'
         return '<circle cx="{x:.2f}" cy="{y:.2f}" r="{r:d}" fill="url(#{s})"/>\n'.format(
-            x = self.atom.x*100 + offsetx, y = self.atom.y*100 + offsety, r = radius[self.atom.element], s = element_name[self.atom.element])
+            x = self.atom.x*100 + offsetx, y = self.atom.y*100 + offsety, r = rad, s = fill)
 class Bond:
     """
     A wrapper class for a bond url(#atomname)
@@ -52,8 +62,8 @@ class Bond:
 
         zAxisRatio = projLen/length;
         
-        sinPart = zAxisRatio*math.sin(angle);
-        cosPart = zAxisRatio*math.cos(angle);
+        sinPart = zAxisRatio*math.sin(angle)*0.9;
+        cosPart = zAxisRatio*math.cos(angle)*0.9;
         if(atom1.y < atom2.y):
             cosPart = -cosPart;
             if(angleInDegrees > 0):
@@ -63,10 +73,20 @@ class Bond:
 
         width = 15;
 
-        x1 = aBond.x1 * 100 + offsetx - radius[atom1.element]*sinPart
-        x2 = aBond.x2 * 100 + offsetx + radius[atom2.element]*sinPart
-        y1 = aBond.y1 * 100 + offsety - radius[atom1.element]*cosPart
-        y2 = aBond.y2 * 100 + offsety + radius[atom2.element]*cosPart
+        if atom1.element in radius:
+            radiusA1 = radius[atom1.element];
+        else:
+            radiusA1 = 40
+
+        if atom2.element in radius:
+            radiusA2 = radius[atom2.element];
+        else:
+            radiusA2 = 40
+
+        x1 = aBond.x1 * 100 + offsetx - radiusA1*sinPart
+        x2 = aBond.x2 * 100 + offsetx + radiusA2*sinPart
+        y1 = aBond.y1 * 100 + offsety - radiusA1*cosPart
+        y2 = aBond.y2 * 100 + offsety + radiusA2*cosPart
         dx = aBond.dx * width ;
         dy = aBond.dy * width ;
         if(atom1.z < atom2.z):

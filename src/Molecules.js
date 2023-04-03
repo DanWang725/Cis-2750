@@ -15,6 +15,18 @@ export function MoleculeList(props){
     useEffect(()=> {
       FetchMolecules()
     },[])
+
+    const DeleteMolecule = (code) => {
+      console.log(code)
+      fetch("../molecule.json", {method:"DELETE", 
+      headers: {"Content-type": "text"},
+      body: code
+      })
+      .then((response) => {console.log(response);
+        FetchMolecules();
+      })
+      .catch((err) => console.error(err))
+    }
   
     if(molecule.length === 0){
       return (<div className='Molecule Page-content '>
@@ -26,7 +38,7 @@ export function MoleculeList(props){
       <p className='gradient-bottom'>Molecules in Database</p>
       <div className='MoleculeList'>
       {molecule.map((molecules, i) => (
-        <MoleculeInformation {...molecules} key={i}></MoleculeInformation>
+        <MoleculeInformation {...molecules} key={i} deleteCallbackHandler={DeleteMolecule}></MoleculeInformation>
       ))}
       </div>
       <button onClick={()=>FetchMolecules()}>Refresh</button>
@@ -51,6 +63,7 @@ export function MoleculeList(props){
         <p>id: {props.id}</p>
         <p>Atoms No: {props.atom_count}</p>
         <p>Bond No: {props.bond_count}</p>
+        <button onClick={()=>props.deleteCallbackHandler(props.name)}></button>
         <Link to={{
             pathname: '/molecule/view',
             state: { molecule : props.name } // you can pass svetsko here

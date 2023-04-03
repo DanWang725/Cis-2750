@@ -30,8 +30,7 @@ class Database:
                     ELEMENT_CODE    VARCHAR(3)      NOT NULL,
                     X               DECIMAL(7,4)    NOT NULL,
                     Y               DECIMAL(7,4)    NOT NULL,
-                    Z               DECIMAL(7,4)    NOT NULL,
-                    FOREIGN KEY (ELEMENT_CODE) REFERENCES Elements);""");
+                    Z               DECIMAL(7,4)    NOT NULL);""");
         
         self.conn.execute("""CREATE TABLE IF NOT EXISTS Bonds(
                     BOND_ID     INTEGER PRIMARY KEY AUTOINCREMENT   NOT NULL,
@@ -177,6 +176,12 @@ class Database:
                 <stop offset="50%" stop-color="#{radius[2]}"/>
                 <stop offset="100%" stop-color="#{radius[3]}"/>
                 </radialGradient>""";
+        svgString+= f"""
+                <radialGradient id="default" cx="-50%" cy="-50%" r="220%" fx="20%" fy="20%">
+                <stop offset="0%" stop-color="#32CD32"/>
+                <stop offset="50%" stop-color="#32CD32"/>
+                <stop offset="100%" stop-color="#32CD32"/>
+                </radialGradient>""";
         
         return svgString
     def getElementsJSON(self):
@@ -193,6 +198,7 @@ class Database:
         return list;
     def deleteEntry(self, table, identifier, name):
         print("WE HAVE DELETED SOMETIHNG")
+
         count = self.conn.execute(f""" SELECT COUNT(*) FROM {table} WHERE {identifier}={name};""").fetchone();
         if(count == 0):
             return False, True
@@ -203,6 +209,30 @@ class Database:
             return True, True
         else:
             return False, False
+    def delete_molecule(self, name):
+        count = self.conn.execute(f""" SELECT COUNT(*) FROM Molecules WHERE Molecules.NAME='{name}';""").fetchone();
+        if count == 0:
+            return False
+        try:
+            self.conn.execute(f"""DELETE FROM Atoms WHERE EXISTS
+                            (SELECT * FROM MoleculeAtom INNER JOIN Molecules ON MoleculeAtom.MOLECULE_ID=Molecules.MOLECULE_ID
+                                WHERE Molecules.NAME='{name}' AND MoleculeAtom.ATOM_ID=Atoms.ATOM_ID);""" );
+            self.conn.execute(f"""DELETE FROM Bonds WHERE EXISTS
+                            (SELECT * FROM MoleculeBond INNER JOIN Molecules ON MoleculeBond.MOLECULE_ID=Molecules.MOLECULE_ID
+                                WHERE Molecules.NAME='{name}' AND MoleculeBond.BOND_ID=Bonds.BOND_ID);""" );
+            self.conn.execute(f"""DELETE FROM
+                                MoleculeAtom WHERE EXISTS 
+                                (SELECT * FROM Molecules WHERE Molecules.NAME='{name}' AND MoleculeAtom.MOLECULE_ID=Molecules.MOLECULE_ID);""")
+            self.conn.execute(f"""DELETE FROM
+                                MoleculeBond WHERE EXISTS 
+                                (SELECT * FROM Molecules WHERE Molecules.NAME='{name}' AND MoleculeBond.MOLECULE_ID=Molecules.MOLECULE_ID);""")
+            self.conn.execute(f""" DELETE FROM Molecules WHERE Molecules.NAME='{name}';""")
+            self.conn.commit();
+            return True
+        except Exception as e:
+            print(e);
+            self.conn.rollback();
+            return False
 
 if __name__ == "__main__":
     db = Database(reset=True);
@@ -235,6 +265,10 @@ if __name__ == "__main__":
     molculeList = db.load_allMol();
     for name in molculeList:
         print(name);
+    # db.delete_molecule('Water')
+    # molculeList = db.load_allMol();
+    # for name in molculeList:
+    #     print(name);
     #db.deleteEntry('Elements','ELEMENT_CODE',"'H'")
     
     # for molecule in ['Water', 'Caffeine', 'Isopentanol' , 'Romanium']: #'Water', 'Caffeine', 'Isopentanol' , 

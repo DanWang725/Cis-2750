@@ -158,6 +158,20 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response( 404 );
         self.end_headers();
         self.wfile.write( bytes( "404: not found", "utf-8" ) );
+    elif self.path == "/molecule.json":
+      data = self.rfile.read(int(self.headers['Content-length']));
+      molName = data.decode('utf-8');
+      print(molName)
+      print(f"{molName}")
+      result = database.delete_molecule(f"{molName}")
+      if(result):
+        self.send_response( 200 );
+        self.end_headers();
+        self.wfile.write( bytes( "Normal", "utf-8" ) );
+      else :
+        self.send_response( 404 );
+        self.end_headers();
+        self.wfile.write( bytes( "404: not found", "utf-8" ) )
     else:
       self.send_response( 418 );
       self.end_headers();
