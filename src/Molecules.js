@@ -98,6 +98,14 @@ export function MoleculeList(props){
     const [file, setFile] = useState();
     const [name, setName] = useState('');
     let fileReader;
+
+    const handleTextInput = (val)=>{
+      if(! /^[a-zA-Z0-9]+$/.test(val) && val.length > 0){
+        console.log("failed");
+        return;
+      }
+      setName(val);
+    }
   
     function handleSubmit(event) {
       event.preventDefault()
@@ -108,6 +116,10 @@ export function MoleculeList(props){
     }
   
     const uploadFile = (e)=>{
+      if(file.size > 1000){
+        console.log(file.size)
+        return
+      }
       let dataPackage = {data : fileReader.result, name:name}
       
       //console.log(dataPackage)
@@ -129,8 +141,8 @@ export function MoleculeList(props){
     return (
       <div>
         <form onSubmit={handleSubmit}>
-          <input type="text" value={name} onChange={(e)=>setName(e.target.value)}></input>
-          <input type="file" onChange={handleFileChange}></input>
+          <input type="text" value={name} onChange={(e)=>handleTextInput(e.target.value)}></input>
+          <input type="file" onChange={handleFileChange} accept=".sdf"></input>
           <button type="submit">Upload</button> 
         </form>
       </div>

@@ -123,6 +123,40 @@ body {
     height:40%;
     align-self: flex-end;
   }
+  .ElementInfo > span {
+    display: inline-block;
+    margin: 5px;
+    vertical-align: middle;
+  }
+  .Element-colour-list {
+    margin: 1px 10px;
+    display: inline-block;
+    vertical-align: middle;
+    align-self: end;
+    border-left: 1px solid #f0f4fc;
+    padding-left: 10px;
+  }
+  .Element-colour-list > p {
+    font-size: small;
+    vertical-align: middle;
+  }
+  .colour-symbol-pair{
+      font-size: small;
+  }
+  .colour-symbol-pair > p{
+    display: inline;
+    margin-left: 2px;
+    margin-right: 20px;
+  }
+  
+  .small-square{
+    padding: 6px;
+    display: inline-block;
+    position: relative;
+    justify-self: right;
+    border: 1px solid #777;
+    float:right;
+  }
 
   .Element-actions > button{
     transition-duration: 0.2ms;
