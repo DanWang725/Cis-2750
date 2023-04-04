@@ -14,6 +14,7 @@ database = molsql.Database();
 MolDisplay.radius = database.radius();
 MolDisplay.element_name = database.element_name();
 MolDisplay.header += database.radial_gradients();
+
 class Handler(BaseHTTPRequestHandler):
   def do_GET(self):
     if self.path == "/":
@@ -35,14 +36,17 @@ class Handler(BaseHTTPRequestHandler):
 
     else:
       sendReply = False
+      requiresFile = False
       mimetype = ""
       print(self.path)
       if self.path.endswith(".css"):
         mimetype = "text/css"
         sendReply = True
+        requiresFile = True
       if self.path.endswith(".js"):
         mimetype = "application/javascript"
         sendReply = True
+        requiresFile = True
       if self.path.endswith(".json"):
         mimetype = "application/json"
         sendReply = True
@@ -52,13 +56,11 @@ class Handler(BaseHTTPRequestHandler):
       if self.path.endswith(".ico"):
         mimetype = "image/vnd.microsoft.icon"
         sendReply = True
+        requiresFile = True
       
       if sendReply == True:
         if self.path.endswith(".json"):
-          #css = json.dumps(database.getElementsJSON(), indent=4)
-          if self.path.endswith("addtest.json"):
-            database['Elements'] = ( 2, 'D', 'Deez Nuts', 'FFFFFF', '050505', '020202', 25 );
-          
+          #css = json.dumps(database.getElementsJSON(), indent=4
           if self.path == "/molecule.json":
             css = json.dumps(database.load_allMol(), indent=4)
           else:
@@ -66,7 +68,22 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path.endswith(".svg"):
           molecule = re.search('[ \w-]+?(?=\.)', self.path)
           print("Trying to find molecule " + molecule[0])
-          if(molecule[0] == "hp"):
+
+          if(self.path.startswith("/molecule/rotation/")):
+            coords = self.path.split('.');
+            print(coords)
+            if not hasattr(self, 'cache'):
+              self.cache = ''
+              self.cachedMolName = 'none'
+              
+            if self.cachedMolName != molecule[0]:
+              loadedMol = database.load_mol(molecule[0])
+              self.cache = MolDisplay.Rotation()
+              self.cache.loadMol(loadedMol)
+              self.cachedMolName = molecule[0]
+            loadedMol = self.cache.getRotation(int(coords[1]), int(coords[2]), int(coords[3]))
+            
+          elif(molecule[0] == "hp"):
             loadedMol = database.load_mol(random.choice( database.load_allMol())['name'])
           else:
             loadedMol = database.load_mol(molecule[0])

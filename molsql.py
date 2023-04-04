@@ -1,6 +1,7 @@
 import sqlite3;
 import os;
 import MolDisplay;
+import molecule;
 class Database:
     """
     A database class to store molecules
@@ -129,7 +130,6 @@ class Database:
                             WHERE Molecules.NAME='{name}';""" ).fetchall();
         for bond in bonds:
             mol.append_bond(bond[1], bond[2], bond[3])
-        mol.sort()
         return mol
     def load_allMol(self):
         """
@@ -267,15 +267,29 @@ if __name__ == "__main__":
     molculeList = db.load_allMol();
     for name in molculeList:
         print(name);
+
+    
+
     # db.delete_molecule('Water')
     # molculeList = db.load_allMol();
     # for name in molculeList:
     #     print(name);
     #db.deleteEntry('Elements','ELEMENT_CODE',"'H'")
+    mol = db.load_mol( 'Caffeine' );
+    thing = MolDisplay.Rotation()
+    thing.loadMol(mol);
+    for x in range(72):
+        fp = open( "test/thing"+ str(x) + ".svg", "w+" );
+        fp.write( thing.getRotation(x,0,0).svg(True) );
+        fp.close();
     
-    # for molecule in ['Water', 'Caffeine', 'Isopentanol' , 'Romanium']: #'Water', 'Caffeine', 'Isopentanol' , 
-    #     mol = db.load_mol( molecule );
-    #     mol.sort();
-    #     fp = open( molecule + ".svg", "w" );
+    # for molc in ['Water', 'Caffeine', 'Isopentanol' , 'Romanium']: #'Water', 'Caffeine', 'Isopentanol' , 
+    #     mx = molecule.mx_wrapper(40,0,0);
+    #     mol = db.load_mol( molc );
+    #     fp = open( molc + "-original.svg", "w+" );
+    #     fp.write( mol.svg(nightmare=True) );
+    #     fp.close();
+    #     mol.xform( mx.xform_matrix );
+    #     fp = open( molc + ".svg", "w+" );
     #     fp.write( mol.svg(nightmare=True) );
     #     fp.close();

@@ -1,5 +1,6 @@
 import molecule
 import math
+import copy
 header = """<svg version="1.1" width="{x:d}" height="{y:d}"
  xmlns="http://www.w3.org/2000/svg">""";
 footer = """</svg>""";
@@ -54,12 +55,15 @@ class Bond:
         length = math.sqrt((atom2.x - atom1.x)**2 + (atom2.y-atom1.y)**2 + (atom2.z - atom1.z)**2) #length using x,y,z
         lengthFlat = math.sqrt((atom2.x - atom1.x)**2 + (atom2.y-atom1.y)**2)
         projLen = length - abs(atom2.z - atom1.z);
+        if(lengthFlat == 0):
+            lengthFlat = 0.001
         domain = (atom1.x - atom2.x)/lengthFlat
         angle = math.asin(domain);
 
         angleInDegrees = math.degrees(-angle);
 
-
+        if(length == 0):
+            length = 0.001
         zAxisRatio = projLen/length;
         
         sinPart = zAxisRatio*math.sin(angle)*0.9;
@@ -139,6 +143,15 @@ class Molecule(molecule.molecule):
     A wrapper class for a molecule
     Contains methods for parsing an sdf file, and generating svg representation
     """
+    def importMoleculeMolecule(self, mol):
+        # mol = molecule.molecule(mol)
+        for x in range(mol.atom_no):
+            atom = mol.get_atom(x)
+            self.append_atom(atom.element, atom.x, atom.y, atom.z);
+        for x in range(mol.bond_no):
+            bond = mol.get_bond(x)
+            self.append_bond(bond.a1, bond.a2, bond.epairs);
+
     def __str__(self):
         string = ""
         for a in range(self.atom_no):
@@ -148,6 +161,7 @@ class Molecule(molecule.molecule):
         return string
     
     def svg(self, nightmare=False):
+        self.sort()
         """
         Generates svg tags to represent the molecule
         """
@@ -259,7 +273,34 @@ class Molecule(molecule.molecule):
             bond = strPieces[counter].split()
             counter+=1
             self.append_bond(int(bond[0])-1, int(bond[1])-1, (int)(bond[2]))
-    
+class Rotation:
+    def loadMol(self, mol):
+        self.x = []
+        self.y = []
+        self.z = []
+        for i in range(72):
+            tempMol = Molecule()
+            tempMol.importMoleculeMolecule(molecule.molcopy(mol))
+            self.x.append(tempMol);
+            self.x[i].xform(molecule.mx_wrapper(i*5, 0, 0).xform_matrix)
+
+            tempMol = Molecule()
+            tempMol.importMoleculeMolecule(molecule.molcopy(mol))
+            self.y.append(tempMol);
+            self.y[i].xform(molecule.mx_wrapper(0, i*5, 0).xform_matrix);
+            tempMol = Molecule()
+            tempMol.importMoleculeMolecule(molecule.molcopy(mol))
+            self.z.append(tempMol);
+            self.z[i].xform(molecule.mx_wrapper(0, 0, i*5).xform_matrix);
+    def getRotation(self, x, y, z):
+        if x != 0:
+            return self.x[x]
+        if y != 0:
+            return self.y[y]
+        return self.z[z]
+
+
+
 if __name__ == "__main__":
     mol = Molecule()
     
