@@ -186,14 +186,16 @@ class Database:
         return svgString
     def getElementsJSON(self):
         list = [];
-        elements = self.conn.execute(f"""SELECT Elements.ELEMENT_CODE, Elements.ELEMENT_NAME,Elements.COLOUR1, Elements.RADIUS FROM 
+        elements = self.conn.execute(f"""SELECT Elements.ELEMENT_CODE, Elements.ELEMENT_NAME,Elements.COLOUR1,Elements.COLOUR2, Elements.COLOUR3, Elements.RADIUS FROM 
                             Elements;""" ).fetchall();
         for element in elements:
             elementObj = {}
             elementObj['code'] = element[0];
             elementObj['name'] = element[1];
-            elementObj['colour'] = element[2];
-            elementObj['radius'] = element[3];
+            elementObj['colour1'] = element[2];
+            elementObj['colour2'] = element[3];
+            elementObj['colour3'] = element[4];
+            elementObj['radius'] = element[5];
             list.append(elementObj);
         return list;
     def deleteEntry(self, table, identifier, name):

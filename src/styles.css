@@ -51,6 +51,44 @@ body {
     margin: 20px 50px;
   }
 
+  .input-error-message{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: darkred;
+    font-size: small;
+    display: block;
+  }
+
+  .element-input-form > label{
+    display: block;
+    overflow-wrap: break-word;
+  }
+  .element-input-form{
+    display:block;
+    margin: 5px;
+    width:400px;
+    height:75;
+  }
+
+  .input-form-stacked > input{
+    display: inline-block;
+    padding:12px 20px;
+  }
+
+  .input-form > input{
+    padding:12px 20px;
+  }
+
+  .input-form-small > input{
+    width:25%;
+  }
+  .element-input-form-divs{
+    height:250px;
+  }
+
+  .display-inline{
+    display: inline-block;
+  }
+
   
   .content-page{
     background-color: white;
@@ -60,6 +98,7 @@ body {
     border-radius: 2px;
     position: relative;
     padding: 20px;
+    overflow:auto;
   }
 
   .Element{
@@ -258,7 +297,7 @@ body {
     background: transparent;
     height: auto;
     width:100%;
-    overflow:hidden;
+    overflow:auto;
   }
   .mol-background > p{
     background: transparent;

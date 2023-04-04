@@ -49,6 +49,9 @@ class Handler(BaseHTTPRequestHandler):
       if self.path.endswith(".svg"):
         mimetype = "image/svg+xml"
         sendReply = True
+      if self.path.endswith(".ico"):
+        mimetype = "image/vnd.microsoft.icon"
+        sendReply = True
       
       if sendReply == True:
         if self.path.endswith(".json"):
@@ -76,13 +79,21 @@ class Handler(BaseHTTPRequestHandler):
           css = loadedMol.svg(nightmare=True)
           
         else:
-          f = open("src"+self.path, "r")
+          if(self.path.endswith(".ico")):
+            f = open("src"+self.path, "rb")
+          else:
+            f = open("src"+self.path, "r")
+            
+          f.seek(0, os.SEEK_END);
+          length = f.tell()
+          f.seek(0, os.SEEK_SET);
+
           css = ""
-          s = f.readline()
-          while s != "":
-            css += s
-            #print(s)
-            s = f.readline()
+          css = f.read(length)
+          # while s != "":
+          #   css += s
+          #   #print(s)
+          #   s = f.readline()
           f.close()
 
         #print(css)
@@ -90,7 +101,12 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-type",mimetype)
         self.send_header( "Content-length", len(css) );
         self.end_headers()
-        self.wfile.write(bytes(css, "utf-8"))
+
+        if(self.path.endswith(".ico")):
+          self.wfile.write(css)
+        else:
+          self.wfile.write(bytes(css, "utf-8"))
+        
         return
       
       self.send_response( 418 );
@@ -133,7 +149,7 @@ class Handler(BaseHTTPRequestHandler):
       gottenData = json.loads(data.decode('utf-8'));
       if self.path == "/upload/element.json":
         database['Elements'] = ('NULL', gottenData['code'], gottenData['name'],
-                                gottenData['colour'], gottenData['colour'], gottenData['colour'],
+                                gottenData['colour1'], gottenData['colour2'], gottenData['colour3'],
                                 gottenData['radius']);
       #print(gottenData);
       self.send_response( 418 );
