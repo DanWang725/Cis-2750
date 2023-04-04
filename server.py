@@ -38,6 +38,7 @@ class Handler(BaseHTTPRequestHandler):
       sendReply = False
       requiresFile = False
       mimetype = ""
+      css = ''
       print(self.path)
       if self.path.endswith(".css"):
         mimetype = "text/css"
@@ -81,19 +82,36 @@ class Handler(BaseHTTPRequestHandler):
               self.cache = MolDisplay.Rotation()
               self.cache.loadMol(loadedMol)
               self.cachedMolName = molecule[0]
-            loadedMol = self.cache.getRotation(int(coords[1]), int(coords[2]), int(coords[3]))
+            css = self.cache.getRotation(int(coords[1]), int(coords[2]), int(coords[3]))
+          elif(self.path.startswith("/molecule/all/rotation/")):
+            if not hasattr(self, 'cache'):
+              self.cache = ''
+              self.cachedMolName = 'none'
+
+            if self.cachedMolName != molecule[0]:
+              loadedMol = database.load_mol(molecule[0])
+              self.cache = MolDisplay.Rotation()
+              self.cache.loadMol(loadedMol)
+              self.cachedMolName = molecule[0]
+
+            newContent = {}
+            newContent['x'] = self.cache.x;
+            newContent['y'] = self.cache.y;
+            newContent['z'] = self.cache.z;
+            css = json.dumps(newContent, indent=4);
             
           elif(molecule[0] == "hp"):
             loadedMol = database.load_mol(random.choice( database.load_allMol())['name'])
           else:
             loadedMol = database.load_mol(molecule[0])
-          if loadedMol.atom_no == 0:
-            self.send_response( 404 );
-            self.end_headers();
-            self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
-            return
-          
-          css = loadedMol.svg(nightmare=True)
+
+          # if loadedMol.atom_no == 0:
+          #   self.send_response( 404 );
+          #   self.end_headers();
+          #   self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
+          #   return
+          if css == '':
+            css = loadedMol.svg(nightmare=True)
           
         else:
           if(self.path.endswith(".ico")):

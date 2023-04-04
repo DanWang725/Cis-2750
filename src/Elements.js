@@ -6,6 +6,7 @@ export function ElementList(props){
       fetch("../test.json")
         .then((response) => response.json())
         .then((data) => setElement(data))
+        .then((data) => console.log(data))
         .catch((err) => console.error(err))
     }
     // const refreshAddElement = () => {
@@ -133,6 +134,7 @@ function ElementForm(props){
     })
     .then((response) => props.onDataAddition())
     .then(()=>setData(defaults))
+    .then(()=>print())
     .catch((err) => console.error(err))
   }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, createRef} from 'React';
+import { useState, useEffect, createRef, useReducer} from 'React';
 import { BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
 
 export function MoleculeList(props){
@@ -150,12 +150,113 @@ export function MoleculeList(props){
   }
 
   export function MoleculeView(props){
-
+    const [interval, makeInterval] = useState('')
+    const [rotationReady, setReady] = useState(false)
+    const [isSpinning, setSpinning] = useState(false)
+    const [spinIdx, setSpinIdx] = useState(0);
+    const [x, setX] = useState([])
+    const [y, setY] = useState([])
+    const [z, setZ] = useState([])
     const Link = ReactRouterDOM.Link;
+
+    const setIdx = ()=>{
+      setSpinIdx(spinIdx + 1)
+    }
+    // const AnimationRotationX = ()=>{
+    //   if(rotation[1] >= 72){
+    //     setRotation([0, 0, 0])
+    //     return
+    //   }
+    //   setRotation([0, rotation[1]+1, 0]);
+    //   forceUpdate()
+    // }
+
+    const toggleSpin = () =>{
+      // setSpinning(true)
+      // console.log(spinIdx)
+      // setSpinIdx(spinIdx + 1)
+
+      if(isSpinning){
+        setSpinning(false);
+        clearInterval(interval)
+      } else {
+        console.log("spinning")
+        setSpinning(true);
+        makeInterval(setInterval(incrementRotation, 100));
+      }
+      
+      
+    }
+
+    function incrementRotation(){
+
+      // let newRotation = [0,0,0,rotation[3]];
+      // let newVal = rotation[rotation[3]] + 1;
+      
+      // if(newVal >= 72){
+      //   newVal = 0;
+      //   newRotation[3] = rotation[3] === 3 ? 0 : rotation[3] + 1;
+      // }
+      //console.log(spinIdx)
+      setSpinIdx(spinIdx => (spinIdx + 1) % 216)
+      if(!isSpinning){
+        clearInterval(interval)
+      }
+      
+    }
+
+    async function DownloadRotation(x,y,z) {
+      return new Promise((resolve) =>{
+        const img = new Image();
+        img.onload = (resolve);
+        img.src = '../molecule/rotation/'+ prop.state.molecule+'.'+ x+'.'+ y+'.'+ z+'.svg';
+      })
+    }
+
+    async function DownloadSpin(){
+      return (fetch("../molecule/all/rotation/" + prop.state.molecule + ".svg")
+        .then((response) => response.json())
+        .then((data) => {setX(data.x); setY(data.y); setZ(data.z)})
+        .catch((err) => console.error(err))
+      )
+        
+      // for(let i = 0; i < 72; i++){
+      //   await DownloadRotation(i, 0, 0);
+      // }
+      // for(let i = 0; i < 72; i++){
+      //   await DownloadRotation(0, i, 0);
+      // }
+      // for(let i = 0; i < 72; i++){
+      //   await DownloadRotation(0, 0, i);
+      // }
+    }
+
+    const getRotation = (idx) =>{
+      console.log(idx/72)
+      switch(Math.floor(idx / 72)){
+        case 0:
+          return(x[idx % 72])
+        case 1:
+          return(y[idx % 72])
+        case 2:
+          return(z[idx % 72])
+        default:
+          console.log("error")
+          break;
+      }
+    }
+
+    useEffect(()=>{
+      if(prop.state !== undefined){
+        DownloadSpin()
+        .then(()=>setReady(true))
+      }
+    },[]
+    )
 
     const location = ReactRouterDOM.useLocation();
     const prop = {...location}
-    console.log(prop.state)
+    //console.log(prop.state)
     if(prop.state === undefined){
         return (<div className='middle-margins content-page'>
             <h1>Error - Attempted to access data without request</h1>
@@ -168,10 +269,13 @@ export function MoleculeList(props){
     }
     return (<div className='middle-margins content-page Molecule-view'>
         <h1>{prop.state.molecule}</h1>
-        <img src={"../molecule/"+ prop.state.molecule +".svg"} style={{ height: '100%', width: 'auto'}} alt="preview"/>
+        <button className='MoleculeCard-action' onClick={()=>toggleSpin()}>SPIN</button>
+        {isSpinning ? <span dangerouslySetInnerHTML={{ __html: getRotation(spinIdx)}} /> : ''}
+        {/* <img src={('../molecule/rotation/'+ prop.state.molecule+ '.'+ rotation[0]+'.'+ rotation[1]+'.'+ rotation[2]+'.svg')} style={{ height: '100%', width: 'auto'}} alt="preview"/> */}
         <Link to={{
             pathname: '/molecule' // you can pass svetsko here
         }}>
+          
             <button className='MoleculeCard-action'>Back</button>
         </Link>
     </div>)

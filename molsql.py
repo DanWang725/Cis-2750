@@ -277,14 +277,17 @@ if __name__ == "__main__":
     #db.deleteEntry('Elements','ELEMENT_CODE',"'H'")
     mol = db.load_mol( 'Caffeine' );
     thing = MolDisplay.Rotation()
+    fp = open( "test/thing.svg", "w+" );
+    fp.write( mol.svg(True) );
+    fp.close();
     thing.loadMol(mol);
     for x in range(72):
         fp = open( "test/thing"+ str(x) + ".svg", "w+" );
-        fp.write( thing.getRotation(x,0,0).svg(True) );
+        fp.write( thing.getRotation(x,0,0) );
         fp.close();
     
     # for molc in ['Water', 'Caffeine', 'Isopentanol' , 'Romanium']: #'Water', 'Caffeine', 'Isopentanol' , 
-    #     mx = molecule.mx_wrapper(40,0,0);
+    #     mx = molecule.mx_wrapper(5,0,0);
     #     mol = db.load_mol( molc );
     #     fp = open( molc + "-original.svg", "w+" );
     #     fp.write( mol.svg(nightmare=True) );

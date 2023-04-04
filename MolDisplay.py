@@ -160,7 +160,7 @@ class Molecule(molecule.molecule):
             string += str(Bond(self.get_bond(b))) + '\n';
         return string
     
-    def svg(self, nightmare=False):
+    def svg(self, nightmare=False, rotation=False):
         self.sort()
         """
         Generates svg tags to represent the molecule
@@ -168,21 +168,32 @@ class Molecule(molecule.molecule):
         atomIdx = 0
         bondIdx = 0
         
-        statsX = {'max':0.0,'min':0.0}
-        statsY = {'max':0.0, 'min':0.0}
-        for a in range(self.atom_no):
-            atom = Atom(self.get_atom(a));
-            statsX['max'] = max(statsX['max'], atom.atom.x)
-            statsY['max'] = max(statsY['max'], atom.atom.y)
-            statsX['min'] = min(statsX['min'], atom.atom.x)
-            statsY['min'] = min(statsY['min'], atom.atom.y)
-
-        height = math.ceil(statsY['max']-statsY['min'])*100 + 300
-        width = math.ceil(statsX['max']-statsX['min'])*100 + 300
         global offsetx, offsety
+
+        if(rotation):
+            if not hasattr(self, 'max_length'):
+                self.max_length = 0
+                for a in range(self.atom_no):
+                    atom = Atom(self.get_atom(a));
+                    self.max_length = max(math.sqrt((atom.atom.x) ** 2 + (atom.atom.y) ** 2 + (atom.atom.z) ** 2), self.max_length);
+            height = math.ceil(self.max_length * 2)*100 + 150
+            width = math.ceil(self.max_length * 2)*100 + 150
+        else:
+            statsX = {'max':0.0,'min':0.0}
+            statsY = {'max':0.0, 'min':0.0}
+            for a in range(self.atom_no):
+                atom = Atom(self.get_atom(a));
+                statsX['max'] = max(statsX['max'], atom.atom.x)
+                statsY['max'] = max(statsY['max'], atom.atom.y)
+                statsX['min'] = min(statsX['min'], atom.atom.x)
+                statsY['min'] = min(statsY['min'], atom.atom.y)
+
+            height = math.ceil(statsY['max']-statsY['min'])*100 + 300
+            width = math.ceil(statsX['max']-statsX['min'])*100 + 300
+        
         offsetx = math.ceil((width-150)/2)
         offsety = math.ceil((height-150)/2)
-        print(f"offsetx {offsetx} offsety {offsety}")
+        # print(f"offsetx {offsetx} offsety {offsety}")
         svgString = header.format(x=width, y=height)
 
         # adding the svg based on z values
@@ -278,20 +289,19 @@ class Rotation:
         self.x = []
         self.y = []
         self.z = []
+        mx = molecule.mx_wrapper(5,0,0);
+        my = molecule.mx_wrapper(0,5,0);
+        mz = molecule.mx_wrapper(0,0,5);
         for i in range(72):
-            tempMol = Molecule()
-            tempMol.importMoleculeMolecule(molecule.molcopy(mol))
-            self.x.append(tempMol);
-            self.x[i].xform(molecule.mx_wrapper(i*5, 0, 0).xform_matrix)
+            self.x.append(mol.svg(nightmare=True, rotation=True))
+            mol.xform(mx.xform_matrix)
+        for i in range(72):
+            self.y.append(mol.svg(nightmare=True, rotation=True))
+            mol.xform(my.xform_matrix)
+        for i in range(72):
+            self.z.append(mol.svg(nightmare=True, rotation=True))
+            mol.xform(mz.xform_matrix)
 
-            tempMol = Molecule()
-            tempMol.importMoleculeMolecule(molecule.molcopy(mol))
-            self.y.append(tempMol);
-            self.y[i].xform(molecule.mx_wrapper(0, i*5, 0).xform_matrix);
-            tempMol = Molecule()
-            tempMol.importMoleculeMolecule(molecule.molcopy(mol))
-            self.z.append(tempMol);
-            self.z[i].xform(molecule.mx_wrapper(0, 0, i*5).xform_matrix);
     def getRotation(self, x, y, z):
         if x != 0:
             return self.x[x]
