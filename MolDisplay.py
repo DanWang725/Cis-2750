@@ -3,6 +3,7 @@ import math
 import copy
 header = """<svg version="1.1" {:s}
  xmlns="http://www.w3.org/2000/svg">""";
+radial_gradient = ''
 footer = """</svg>""";
 offsetx = 1000;
 offsety = 1000;
@@ -21,7 +22,7 @@ class Atom:
             rad = radius[self.atom.element];
         else:
             rad = 40
-            print("can't find", self.atom.element)
+            # print("can't find", self.atom.element)
 
         if self.atom.element in element_name:
             fill = element_name[self.atom.element]
@@ -198,6 +199,9 @@ class Molecule(molecule.molecule):
             svgString = header.format('class="svg-fit" viewbox="0 0 {:d} {:d}"'.format(width, height))
         else:    
             svgString = header.format('width="{:d}" height="{:d}"'.format(width, height))
+        
+        if nightmare:
+            svgString += radial_gradient;
 
         # adding the svg based on z values
         while atomIdx < self.atom_no or bondIdx < self.bond_no:

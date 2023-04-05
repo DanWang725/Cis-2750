@@ -13,7 +13,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler;
 database = molsql.Database();
 MolDisplay.radius = database.radius();
 MolDisplay.element_name = database.element_name();
-MolDisplay.header += database.radial_gradients();
+MolDisplay.radial_gradient = database.radial_gradients();
 
 class Handler(BaseHTTPRequestHandler):
   def do_GET(self):
@@ -188,9 +188,11 @@ class Handler(BaseHTTPRequestHandler):
                                 gottenData['colour1'], gottenData['colour2'], gottenData['colour3'],
                                 gottenData['radius']);
       #print(gottenData);
-      self.send_response( 404 );
+      MolDisplay.radius = database.radius();
+      MolDisplay.element_name = database.element_name();
+      MolDisplay.radial_gradient = database.radial_gradients();
+      self.send_response( 200 );
       self.end_headers();
-      self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
     else:
       self.send_response( 404 );
       self.end_headers();
@@ -203,6 +205,9 @@ class Handler(BaseHTTPRequestHandler):
       print(f"{elementCode}")
       result, isDatabaseDestroyed = database.deleteEntry('Elements','ELEMENT_CODE',f"'{elementCode}'")
       if(result):
+        MolDisplay.radius = database.radius();
+        MolDisplay.element_name = database.element_name();
+        MolDisplay.radial_gradient = database.radial_gradients();
         self.send_response( 200 );
         self.end_headers();
         self.wfile.write( bytes( "Normal", "utf-8" ) );

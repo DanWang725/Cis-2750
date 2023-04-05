@@ -178,9 +178,9 @@ class Database:
                 </radialGradient>""";
         svgString+= f"""
                 <radialGradient id="default" cx="-50%" cy="-50%" r="220%" fx="20%" fy="20%">
-                <stop offset="0%" stop-color="#32CD32"/>
-                <stop offset="50%" stop-color="#32CD32"/>
-                <stop offset="100%" stop-color="#32CD32"/>
+                <stop offset="0%" stop-color="#FF00FF"/>
+                <stop offset="50%" stop-color="#8C018C"/>
+                <stop offset="100%" stop-color="#140014"/>
                 </radialGradient>""";
         
         return svgString
@@ -202,12 +202,15 @@ class Database:
         print("WE HAVE DELETED SOMETIHNG")
 
         count = self.conn.execute(f""" SELECT COUNT(*) FROM {table} WHERE {identifier}={name};""").fetchone();
-        if(count == 0):
+        if(count[0] == 0):
             return False, True
+        print("WE HAVE DELETED SOMETIHNG2")
+
         self.conn.execute(f""" DELETE FROM {table} WHERE {identifier}={name};""")
         count = self.conn.execute(f""" SELECT COUNT(*) FROM {table} WHERE {identifier}={name};""").fetchone();
         self.conn.commit();
-        if(count == 0):
+        print(count)
+        if(count[0] == 0):
             return True, True
         else:
             return False, False
