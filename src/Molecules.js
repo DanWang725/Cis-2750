@@ -4,12 +4,14 @@ import ReactSlider from 'react-slider'
 
 export function MoleculeList(props){
     let [molecule, setMolecule] = useState([]);
+    let [isLoaded, setIsLoaded] = useState(false);
     const FetchMolecules = () =>{
       fetch("../molecule.json")
         .then((response) => response.json())
         .then((data) => {
           console.log(data);
-          setMolecule(data)})
+          setMolecule(data);
+          setIsLoaded(true)})
         .catch((err) => console.error(err))
     }
   
@@ -29,7 +31,7 @@ export function MoleculeList(props){
       .catch((err) => console.error("lol"))
     }
   
-    if(molecule.length === 0){
+    if(molecule.length === 0 && !isLoaded){
       return (<div className='Molecule middle-margins content-page'>
         <p>Loading Molecules...</p>
       </div>)
@@ -37,11 +39,13 @@ export function MoleculeList(props){
   
     return (<div className='Molecule middle-margins content-page'>
       <p className='gradient-bottom'>Molecules in Database</p>
-      <div className='MoleculeList'>
-      {molecule.map((molecules, i) => (
-        <MoleculeInformation {...molecules} key={i} deleteCallbackHandler={DeleteMolecule}></MoleculeInformation>
-      ))}
-      </div>
+      { molecule.length !== 0 ? (<div className='MoleculeList'>
+                {molecule.map((molecules, i) => (
+                <MoleculeInformation {...molecules} key={i} deleteCallbackHandler={DeleteMolecule}></MoleculeInformation>
+                ))}
+              </div>) : (<div>There are no molecules in the database... Upload one</div>)
+      }
+      
       <button onClick={()=>FetchMolecules()}>Refresh</button>
       <MoleculeUpload refreshHandler={FetchMolecules}></MoleculeUpload>
     </div>)
@@ -118,10 +122,16 @@ export function MoleculeList(props){
     }
   
     const uploadFile = (e)=>{
+      if(!file.name.endsWith(".sdf")){
+        setUploadResponse('Invalid file type selected.')
+        return;
+      }
       if(file.size > 100000){
         console.log(file.size)
+        setUploadResponse('File size is too large.')
         return
       }
+      
       let dataPackage = {data : fileReader.result, name:name}
       
       //console.log(dataPackage)
