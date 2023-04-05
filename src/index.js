@@ -25,7 +25,7 @@ function Refresh(){
 function Homepage(props){
   return (<div className='Homepage'>
     <h1>Molecule Viewer</h1>
-    <h2>by Daniel Wang</h2>
+    <h2>Daniel Wang</h2>
   </div>)
 }
 
@@ -55,10 +55,10 @@ function App(props) {
           <NavLink to='/' exact={true} className='Navbar-link' activeClassName="Navbar-active">Home</NavLink>
         </li>
         <li>
-          <NavLink to='/molecule'className='Navbar-link' activeClassName="Navbar-active">molecule</NavLink>
+          <NavLink to='/molecule'className='Navbar-link' activeClassName="Navbar-active">Molecule</NavLink>
         </li>
         <li>
-          <NavLink to='/element'className='Navbar-link' activeClassName="Navbar-active">element</NavLink>
+          <NavLink to='/element'className='Navbar-link' activeClassName="Navbar-active">Element</NavLink>
         </li>
       </ul>
         <Route path='/' exact component={mainMenu}></Route>  

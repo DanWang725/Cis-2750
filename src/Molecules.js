@@ -26,11 +26,11 @@ export function MoleculeList(props){
       .then((response) => {console.log(response);
         FetchMolecules();
       })
-      .catch((err) => console.error(err))
+      .catch((err) => console.error("lol"))
     }
   
     if(molecule.length === 0){
-      return (<div className='Molecule Page-content '>
+      return (<div className='Molecule middle-margins content-page'>
         <p>Loading Molecules...</p>
       </div>)
     }
@@ -43,7 +43,7 @@ export function MoleculeList(props){
       ))}
       </div>
       <button onClick={()=>FetchMolecules()}>Refresh</button>
-      <MoleculeUpload></MoleculeUpload>
+      <MoleculeUpload refreshHandler={FetchMolecules}></MoleculeUpload>
     </div>)
   }
   function MoleculeInformation(props){
@@ -98,6 +98,7 @@ export function MoleculeList(props){
   export function MoleculeUpload(props){
     const [file, setFile] = useState();
     const [name, setName] = useState('');
+    const [response, setResponse] = useState('');
     let fileReader;
 
     const handleTextInput = (val)=>{
@@ -128,10 +129,25 @@ export function MoleculeList(props){
           headers: {"Content-type": "application/json"},
           body: JSON.stringify(dataPackage)
         })
-        .then((response) => console.log(response))
+        .then((response) => {
+          if(!response.ok){
+            setUploadResponse('File was unable to be uploaded.')
+          } else {
+            setUploadResponse('File uploaded successfully')
+            props.refreshHandler()
+          }
+        })
         .catch((err) => console.error(err))
         console.log(file)
-        
+    }
+
+    const setUploadResponse = (val)=>{
+      setResponse(val)
+      setTimeout(clearUploadResponse, 5000)
+    }
+
+    const clearUploadResponse = ()=>{
+      setResponse('')
     }
   
     const handleFileChange = (e) => {
@@ -139,13 +155,18 @@ export function MoleculeList(props){
         setFile(e.target.files[0]);
       }
     };
+
     return (
       <div>
-        <form onSubmit={handleSubmit}>
+        <p className='molecule-info-title'>Upload a molecule</p>
+        <form onSubmit={handleSubmit} className='input-form element-input-form inline'>
+          <label>Molecule Name</label>
           <input type="text" value={name} onChange={(e)=>handleTextInput(e.target.value)}></input>
-          <input type="file" onChange={handleFileChange} accept=".sdf"></input>
-          <button type="submit">Upload</button> 
+          <input className='display-inline' type="file" onChange={handleFileChange} accept=".sdf"></input>
+          <button className='MoleculeCard-action large-button' type="submit" disabled={!file || !name}>Upload</button> 
         </form>
+        <label>{!file || !name ? 'A name and file is required': ' ' }</label>
+        <p>{response}</p>
       </div>
     )
   }
@@ -178,7 +199,7 @@ export function MoleculeList(props){
       } else {
         // console.log("spinning")
         setSpinning(true);
-        makeInterval(setInterval(incrementRotation, 1));
+        makeInterval(setInterval(incrementRotation, 20));
       }
     }
 

@@ -28,14 +28,14 @@ export function ElementList(props){
   
     if(!elements){
       return (
-      <div className='ContactList middle-margins content-page'>
+      <div className='Molecule middle-margins content-page'>
         <p>Loading elements....</p>
       </div>)
     }
   
     return (
-      <div className='ContactList middle-margins content-page'>
-        <h1>Elements</h1>
+      <div className='Molecule middle-margins content-page'>
+        <p className='gradient-bottom'>Elements</p>
         {elements.map((element, i) => (
           <Element {...element} key={i} testDataThing={FetchDeleteElement}/>
         ))}
@@ -108,9 +108,16 @@ function ElementForm(props){
     return true;
   }
 
+  const validateAllDataEmpties = () => {
+    if(data.code === '' || data.name === '' || data.radius < Number(0) || data.colour1.length !== 6 || data.colour2.length !== 6 || data.colour3.length !== 6){
+      return false;
+    }
+    return true
+  }
+
   const SendData = () =>{
     console.log(data)
-    if(!validateAllData()){
+    if(!validateAllData() || !validateAllDataEmpties()){
       return;
     }
     fetch("../upload/element.json", {method:"POST", 
@@ -125,7 +132,10 @@ function ElementForm(props){
 
   useEffect(() => {
     let timeout = setTimeout(() => {
-      if(!validateAllData()){
+      if(!validateAllDataEmpties()){
+        setErrormessage("Some fields are not filled in correctly")
+      }
+      else if(!validateAllData()){
         setErrormessage("Form contains invalid data")
       } else {
         setErrormessage('')
@@ -183,23 +193,23 @@ function ElementForm(props){
 
     let elements = (<div>
       <div className='display-inline element-input-form-divs'>
-      <ElementInputForm styling='input-form-small input-form element-input-form' type="text" name="code" inputValue={data} onInputValueChange={handleChange} validification={validateCode}/>
-      <ElementInputForm styling='input-form element-input-form' type="text" name="name" inputValue={data} onInputValueChange={handleChange} validification={validateName}/>
-      <ElementInputForm styling='input-form  element-input-form' type="number" name="radius" inputValue={data} onInputValueChange={handleChange} validification={validateRadius}/>
+      <ElementInputForm styling='input-form-small input-form element-input-form' type="text" name="code" displayName="Element Code" inputValue={data} onInputValueChange={handleChange} validification={validateCode}/>
+      <ElementInputForm styling='input-form element-input-form' type="text" name="name" displayName="Element Name" inputValue={data} onInputValueChange={handleChange} validification={validateName}/>
+      <ElementInputForm styling='input-form  element-input-form' type="number" name="radius" displayName="Element Radius" inputValue={data} onInputValueChange={handleChange} validification={validateRadius}/>
       </div>
       <div className='display-inline element-input-form-divs'>
-        <ElementInputForm styling='input-form-stacked element-input-form' type="text" name="colour1" inputValue={data} onInputValueChange={handleChange} validification={validateColour}/>
-        <ElementInputForm styling='input-form-stacked element-input-form'type="text" name="colour2" inputValue={data} onInputValueChange={handleChange} validification={validateColour}/>
-        <ElementInputForm styling='input-form-stacked element-input-form' type="text" name="colour3" inputValue={data} onInputValueChange={handleChange} validification={validateColour}/>
+        <ElementInputForm styling='input-form-stacked element-input-form' type="text" name="colour1" displayName="Colour 1" inputValue={data} onInputValueChange={handleChange} validification={validateColour}/>
+        <ElementInputForm styling='input-form-stacked element-input-form'type="text" name="colour2" displayName="Colour 2" inputValue={data} onInputValueChange={handleChange} validification={validateColour}/>
+        <ElementInputForm styling='input-form-stacked element-input-form' type="text" name="colour3" displayName="Colour 3" inputValue={data} onInputValueChange={handleChange} validification={validateColour}/>
       </div>
       </div>)
     return (<div>
-        <h1>Add Element</h1>
+        <p className='molecule-info-title'>Add Element</p>
         <form>
           {elements}
         </form>
-        <button onClick={SendData} disabled={errormessage}>Add Element</button>
-        <label>{errormessage}</label>
+        <button className='MoleculeCard-action' onClick={SendData} disabled={errormessage}>Add Element</button>
+        <label className='input-error-message'>{errormessage}</label>
       </div>
     )
     
@@ -221,7 +231,7 @@ function ElementForm(props){
 
     return (
       <div className={props.styling}>
-        <label>{props.name}</label>
+        <label>{props.displayName}</label>
         <input type={props.type}
           name={props.name}
           value={props.inputValue[props.name]} 
