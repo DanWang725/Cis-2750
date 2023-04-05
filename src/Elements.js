@@ -126,7 +126,6 @@ function ElementForm(props){
     })
     .then((response) => props.onDataAddition())
     .then(()=>setData(defaults))
-    .then(()=>print())
     .catch((err) => console.error(err))
   }
 

@@ -144,7 +144,7 @@ class Handler(BaseHTTPRequestHandler):
         
         return
       
-      self.send_response( 418 );
+      self.send_response( 404 );
       self.end_headers();
       self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
   
@@ -162,8 +162,9 @@ class Handler(BaseHTTPRequestHandler):
         
         #print("ENDLLINE")
       if not database.add_molecule_str(gottenData['name'], gottenData['data']):
-        self.send_response( 415 ); # OK
+        self.send_response( 404 ); # OK
         self.end_headers()
+        return;
 
       self.send_response( 200 ); # OK
       # mol = MolDisplay.Molecule();
@@ -187,11 +188,11 @@ class Handler(BaseHTTPRequestHandler):
                                 gottenData['colour1'], gottenData['colour2'], gottenData['colour3'],
                                 gottenData['radius']);
       #print(gottenData);
-      self.send_response( 418 );
+      self.send_response( 404 );
       self.end_headers();
       self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
     else:
-      self.send_response( 418 );
+      self.send_response( 404 );
       self.end_headers();
       self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
   def do_DELETE(self):
@@ -224,7 +225,7 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers();
         self.wfile.write( bytes( "404: not found", "utf-8" ) )
     else:
-      self.send_response( 418 );
+      self.send_response( 404 );
       self.end_headers();
       self.wfile.write( bytes( "418: IT TEAPOTTIN TIME, PROCEEDS TO TEAPOT ALL OVER YOU", "utf-8" ) );
 
