@@ -17,7 +17,7 @@ Then go to `localhost:[port]`
 
 ### Nightmare Mode
 This assignment was done in nightmare mode.
-The mole
+The molecule has an option to continually spin.
 ## About
 Author: Daniel Wang
 
