@@ -60,17 +60,17 @@ export function MoleculeList(props){
     return (<div key={props.i} className='MoleculeCard MoleculeCard-Front'>
       <div className="MoleculeCard-Wrapper">
         {display}
-        <p>{props.name}</p>
+        <p className='molecule-info-title'>{props.name}</p>
         <p>id: {props.id}</p>
         <p>Atoms No: {props.atom_count}</p>
         <p>Bond No: {props.bond_count}</p>
-        <button onClick={()=>props.deleteCallbackHandler(props.name)}></button>
         <Link to={{
-            pathname: '/molecule/view',
-            state: { molecule : props.name } // you can pass svetsko here
+          pathname: '/molecule/view',
+          state: { molecule : props.name } // you can pass svetsko here
         }}>
             <button className='MoleculeCard-action'>Show</button>
         </Link>
+          <button className='MoleculeCard-action' onClick={()=>props.deleteCallbackHandler(props.name)}>Delete</button>
       </div>
     </div>)
   }
@@ -166,8 +166,8 @@ export function MoleculeList(props){
     }
 
     const sliderHandleChange = (event)=>{
-      console.log("spinidx: "+spinIdx)
-      console.log("slider: "+event.target.value + " axis: " + axis)
+      // console.log("spinidx: "+spinIdx)
+      // console.log("slider: "+event.target.value + " axis: " + axis)
       setSpinIdx((axis * 72) + Number(event.target.value))
     }
 
@@ -176,13 +176,10 @@ export function MoleculeList(props){
         setSpinning(false);
         clearInterval(interval)
       } else {
-        console.log("spinning")
+        // console.log("spinning")
         setSpinning(true);
-        makeInterval(setInterval(incrementRotation, 100));
+        makeInterval(setInterval(incrementRotation, 1));
       }
-    }
-    const externalTest = () =>{
-      console.log("externally, " + (spinIdx => spinIdx))
     }
 
     function incrementRotation(){
@@ -202,10 +199,10 @@ export function MoleculeList(props){
     }
 
     function updateAxisButton(val){
-      console.log("before:" + axis)
+      // console.log("before:" + axis)
       setSpinIdx((spinIdx % 72) + val*72)
       setAxis(val)
-      console.log("after:" + axis)
+      // console.log("after:" + axis)
     }
 
     const getRotation = (idx) =>{
@@ -244,14 +241,14 @@ export function MoleculeList(props){
         </div>)
     }
     return (<div className='middle-margins content-page Molecule-view'>
+        <h1 className='gradient-bottom'>{prop.state.molecule}</h1>
+        <Link className='display-block' to={{
+            pathname: '/molecule' // you can pass svetsko here
+        }}>
+            <button className='MoleculeCard-action'>Back</button>
+        </Link>
         <div className='Molecule-view-side'>
-          <Link to={{
-              pathname: '/molecule' // you can pass svetsko here
-          }}>
-              <button className='MoleculeCard-action'>Back</button>
-          </Link>
-          <h1>{prop.state.molecule}</h1>
-          <button className='MoleculeCard-action' onClick={()=>toggleSpin()}>{isSpinning ? "Stop Spinning" : "Spin Molecule"}</button>
+          <button className='MoleculeCard-action' onClick={()=>toggleSpin()} disabled={!isLoaded}>{isSpinning ? "Stop Spinning" : "Spin Molecule"}</button>
           
           <div className='molecule-rotate-suite'>
             <h1>Rotate Molecule</h1>

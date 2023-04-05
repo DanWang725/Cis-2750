@@ -9,21 +9,6 @@ export function ElementList(props){
         .then((data) => console.log(data))
         .catch((err) => console.error(err))
     }
-    // const refreshAddElement = () => {
-    //   fetch("../addtest.json")
-    //     .then((response) => response.json())
-    //     .then((data) => setElement(data))
-    //     .catch((err) => console.error(err))
-    // }
-  
-    // const testMoleculeGet = () =>{
-    //   fetch("../gettest.json", {method:"POST", 
-    //   headers: {"Content-type": "application/json"},
-    //   body: JSON.stringify({'id':'1', 'name':'Water'})
-    //   })
-    //   .then((response) => console.log(response))
-    //   .catch((err) => console.error(err))
-    // }
   
     const FetchDeleteElement = (code) => {
       console.log(code)
