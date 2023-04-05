@@ -1,7 +1,7 @@
 import molecule
 import math
 import copy
-header = """<svg version="1.1" width="{x:d}" height="{y:d}"
+header = """<svg version="1.1" {:s}
  xmlns="http://www.w3.org/2000/svg">""";
 footer = """</svg>""";
 offsetx = 1000;
@@ -194,7 +194,10 @@ class Molecule(molecule.molecule):
         offsetx = math.ceil((width-150)/2)
         offsety = math.ceil((height-150)/2)
         # print(f"offsetx {offsetx} offsety {offsety}")
-        svgString = header.format(x=width, y=height)
+        if(rotation):
+            svgString = header.format('class="svg-fit" viewbox="0 0 {:d} {:d}"'.format(width, height))
+        else:    
+            svgString = header.format('width="{:d}" height="{:d}"'.format(width, height))
 
         # adding the svg based on z values
         while atomIdx < self.atom_no or bondIdx < self.bond_no:

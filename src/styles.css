@@ -289,6 +289,11 @@ body {
     padding:1px;
   }
 
+  .svg-fit{
+    height:100%;
+    width:auto;
+    }
+
   .MoleculeCardPreview > img{
     object-fit:cover;
   }
@@ -350,13 +355,19 @@ body {
 
   .Molecule-view{
     overflow: hidden;
-    align-items: center;
     height: 80%;
   }
 
-  .Molecule-view > img{
-    overflow: auto;
-    overflow-clip-margin: none;
+  .Molecule-view-side{
+    display: inline-block;
+  }
+  
+  .Molecule-full-image{
+    display:inline-block;
+    height: 100%;
+    width:auto;
+    position: relative;
+    top: 10%;
     float: right;
   }
 

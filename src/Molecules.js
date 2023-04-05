@@ -1,5 +1,6 @@
 import { useState, useEffect, createRef, useReducer} from 'React';
 import { BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
+import ReactSlider from 'react-slider'
 
 export function MoleculeList(props){
     let [molecule, setMolecule] = useState([]);
@@ -151,9 +152,10 @@ export function MoleculeList(props){
 
   export function MoleculeView(props){
     const [interval, makeInterval] = useState('')
-    const [rotationReady, setReady] = useState(false)
+    const [isLoaded, setReady] = useState(false)
     const [isSpinning, setSpinning] = useState(false)
     const [spinIdx, setSpinIdx] = useState(0);
+    const [axis, setAxis] = useState(0);
     const [x, setX] = useState([])
     const [y, setY] = useState([])
     const [z, setZ] = useState([])
@@ -170,6 +172,9 @@ export function MoleculeList(props){
     //   setRotation([0, rotation[1]+1, 0]);
     //   forceUpdate()
     // }
+    const sliderHandleChange = (event)=>{
+      setSpinIdx(axis * 72 + event.target.value)
+    }
 
     const toggleSpin = () =>{
       // setSpinning(true)
@@ -268,15 +273,18 @@ export function MoleculeList(props){
         </div>)
     }
     return (<div className='middle-margins content-page Molecule-view'>
-        <h1>{prop.state.molecule}</h1>
-        <button className='MoleculeCard-action' onClick={()=>toggleSpin()}>SPIN</button>
-        {isSpinning ? <span dangerouslySetInnerHTML={{ __html: getRotation(spinIdx)}} /> : ''}
-        {/* <img src={('../molecule/rotation/'+ prop.state.molecule+ '.'+ rotation[0]+'.'+ rotation[1]+'.'+ rotation[2]+'.svg')} style={{ height: '100%', width: 'auto'}} alt="preview"/> */}
-        <Link to={{
-            pathname: '/molecule' // you can pass svetsko here
-        }}>
-          
-            <button className='MoleculeCard-action'>Back</button>
-        </Link>
+        <div className='Molecule-view-side'>
+          <Link to={{
+              pathname: '/molecule' // you can pass svetsko here
+          }}>
+              <button className='MoleculeCard-action'>Back</button>
+          </Link>
+          <h1>{prop.state.molecule}</h1>
+          <button className='MoleculeCard-action' onClick={()=>toggleSpin()}>SPIN</button>
+          <input className='MoleculeCard-action' type="range" value={(spinIdx % 72)} min={0} max={71} onChange={sliderHandleChange}></input>
+        </div>
+        {isLoaded ? <span className='Molecule-full-image' dangerouslySetInnerHTML={{ __html: getRotation(spinIdx)}} /> : <h1>Loading Image</h1>}
+        
+        {/* <img src={('../molecule/rotation/'+ prop.state.molecule+ '.'+ rotation[0]+'.'+ rotation[1]+'.'+ rotation[2]+'.svg')}  alt="preview"/> */}
     </div>)
   }
