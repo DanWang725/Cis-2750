@@ -298,6 +298,7 @@ body {
     object-fit:cover;
   }
 
+
   .mol-background {
     background: transparent;
     height: auto;
@@ -369,6 +370,28 @@ body {
     position: relative;
     top: 10%;
     float: right;
+  }
+
+  .molecule-button-active {
+    background-color:#f0f4fc;
+    color: black;
+  }
+
+  .molecule-rotate-suite{
+    display:block;
+    padding-top: 10px;
+  }
+  
+  .molecule-button {
+    background-color:white;
+    color: black;
+    border:none;
+    border-left:dimgray 2px;
+    border-right: dimgray 2px;
+    display: inline-block;
+  }
+  .molecule-button:hover{
+    background-color: #f4f8ff;
   }
 
   .ContactList {

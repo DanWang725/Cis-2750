@@ -117,7 +117,7 @@ export function MoleculeList(props){
     }
   
     const uploadFile = (e)=>{
-      if(file.size > 1000){
+      if(file.size > 100000){
         console.log(file.size)
         return
       }
@@ -164,23 +164,14 @@ export function MoleculeList(props){
     const setIdx = ()=>{
       setSpinIdx(spinIdx + 1)
     }
-    // const AnimationRotationX = ()=>{
-    //   if(rotation[1] >= 72){
-    //     setRotation([0, 0, 0])
-    //     return
-    //   }
-    //   setRotation([0, rotation[1]+1, 0]);
-    //   forceUpdate()
-    // }
+
     const sliderHandleChange = (event)=>{
-      setSpinIdx(axis * 72 + event.target.value)
+      console.log("spinidx: "+spinIdx)
+      console.log("slider: "+event.target.value + " axis: " + axis)
+      setSpinIdx((axis * 72) + Number(event.target.value))
     }
 
     const toggleSpin = () =>{
-      // setSpinning(true)
-      // console.log(spinIdx)
-      // setSpinIdx(spinIdx + 1)
-
       if(isSpinning){
         setSpinning(false);
         clearInterval(interval)
@@ -189,33 +180,17 @@ export function MoleculeList(props){
         setSpinning(true);
         makeInterval(setInterval(incrementRotation, 100));
       }
-      
-      
+    }
+    const externalTest = () =>{
+      console.log("externally, " + (spinIdx => spinIdx))
     }
 
     function incrementRotation(){
-
-      // let newRotation = [0,0,0,rotation[3]];
-      // let newVal = rotation[rotation[3]] + 1;
-      
-      // if(newVal >= 72){
-      //   newVal = 0;
-      //   newRotation[3] = rotation[3] === 3 ? 0 : rotation[3] + 1;
-      // }
-      //console.log(spinIdx)
       setSpinIdx(spinIdx => (spinIdx + 1) % 216)
       if(!isSpinning){
         clearInterval(interval)
       }
       
-    }
-
-    async function DownloadRotation(x,y,z) {
-      return new Promise((resolve) =>{
-        const img = new Image();
-        img.onload = (resolve);
-        img.src = '../molecule/rotation/'+ prop.state.molecule+'.'+ x+'.'+ y+'.'+ z+'.svg';
-      })
     }
 
     async function DownloadSpin(){
@@ -224,16 +199,13 @@ export function MoleculeList(props){
         .then((data) => {setX(data.x); setY(data.y); setZ(data.z)})
         .catch((err) => console.error(err))
       )
-        
-      // for(let i = 0; i < 72; i++){
-      //   await DownloadRotation(i, 0, 0);
-      // }
-      // for(let i = 0; i < 72; i++){
-      //   await DownloadRotation(0, i, 0);
-      // }
-      // for(let i = 0; i < 72; i++){
-      //   await DownloadRotation(0, 0, i);
-      // }
+    }
+
+    function updateAxisButton(val){
+      console.log("before:" + axis)
+      setSpinIdx((spinIdx % 72) + val*72)
+      setAxis(val)
+      console.log("after:" + axis)
     }
 
     const getRotation = (idx) =>{
@@ -261,7 +233,6 @@ export function MoleculeList(props){
 
     const location = ReactRouterDOM.useLocation();
     const prop = {...location}
-    //console.log(prop.state)
     if(prop.state === undefined){
         return (<div className='middle-margins content-page'>
             <h1>Error - Attempted to access data without request</h1>
@@ -280,11 +251,19 @@ export function MoleculeList(props){
               <button className='MoleculeCard-action'>Back</button>
           </Link>
           <h1>{prop.state.molecule}</h1>
-          <button className='MoleculeCard-action' onClick={()=>toggleSpin()}>SPIN</button>
-          <input className='MoleculeCard-action' type="range" value={(spinIdx % 72)} min={0} max={71} onChange={sliderHandleChange}></input>
+          <button className='MoleculeCard-action' onClick={()=>toggleSpin()}>{isSpinning ? "Stop Spinning" : "Spin Molecule"}</button>
+          
+          <div className='molecule-rotate-suite'>
+            <h1>Rotate Molecule</h1>
+            <input className='MoleculeCard-action' type="range" value={(spinIdx % 72)} min={0} max={71} onChange={sliderHandleChange}></input>
+            <div>
+              <label>Axis of Rotation</label>
+              <button className={"molecule-button"+ (Math.floor(spinIdx / 72)===0 ? 'molecule-button-active ': '')} onClick={()=>updateAxisButton(0)}>X</button>
+              <button className={"molecule-button"+ (Math.floor(spinIdx / 72)===1 ? 'molecule-button-active': '')} onClick={()=>updateAxisButton(1)}>Y</button>
+              <button className={"molecule-button"+ (Math.floor(spinIdx / 72)===2 ? 'molecule-button-active': '')} onClick={()=>updateAxisButton(2)}>Z</button>
+            </div>
+          </div>
         </div>
         {isLoaded ? <span className='Molecule-full-image' dangerouslySetInnerHTML={{ __html: getRotation(spinIdx)}} /> : <h1>Loading Image</h1>}
-        
-        {/* <img src={('../molecule/rotation/'+ prop.state.molecule+ '.'+ rotation[0]+'.'+ rotation[1]+'.'+ rotation[2]+'.svg')}  alt="preview"/> */}
     </div>)
   }
