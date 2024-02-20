@@ -341,7 +341,7 @@ body {
     animation: rotation 60s infinite ease;
     opacity: 50%;
     content: '';
-    background: url(/molecule/hp.svg) no-repeat fixed center center / 100% auto rgba(0, 0, 0, 0);
+    background:  no-repeat fixed center center / 100% auto rgba(0, 0, 0, 0);
     background-size: contain;
     position: absolute;
     left: 0;
