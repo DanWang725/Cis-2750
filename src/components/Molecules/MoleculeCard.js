@@ -18,10 +18,9 @@ const MoleculeCard = (props) => {
         <p>id: {props.id}</p>
         <p>Atoms No: {props.atom_count}</p>
         <p>Bond No: {props.bond_count}</p>
-        <Link to={{
-          pathname: '/molecule/view',
-          state: { molecule : props.name } // you can pass svetsko here
-        }}>
+        <Link to={'/molecule/view'}
+          state= {{ molecule : props.name }} // you can pass svetsko here
+        >
             <button className='MoleculeCard-action'>Show</button>
         </Link>
           <button className='MoleculeCard-action' onClick={()=>props.deleteCallbackHandler(props.name)}>Delete</button>

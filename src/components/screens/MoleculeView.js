@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react"
 import {Link, useLocation} from 'react-router-dom'
 const MoleculeView = (props) => {
+
+    const prop = useLocation();
+    
     const [interval, makeInterval] = useState('')
     const [isLoaded, setReady] = useState(false)
     const [isSpinning, setSpinning] = useState(false)
@@ -39,7 +42,8 @@ const MoleculeView = (props) => {
       
     }
 
-    async function DownloadSpin(){
+    const DownloadSpin = async () => {
+        if(!prop.state){console.log(prop.state); return }
       return (fetch("../molecule/all/rotation/" + prop.state.molecule + ".svg")
         .then((response) => response.json())
         .then((data) => {setX(data.x); setY(data.y); setZ(data.z)})
@@ -77,9 +81,8 @@ const MoleculeView = (props) => {
     },[]
     )
 
-    const location = useLocation();
-    const prop = {...location}
-    if(prop.state === undefined){
+
+    if(!prop?.state){
         return (<div className='middle-margins content-page'>
             <h1>Error - Attempted to access data without request</h1>
             <Link to={{
@@ -90,7 +93,7 @@ const MoleculeView = (props) => {
         </div>)
     }
     return (<div className='middle-margins content-page Molecule-view'>
-        <h1 className='gradient-bottom'>{prop.state.molecule}</h1>
+        <h1 className='gradient-bottom'>{prop?.state?.molecule}</h1>
         <Link className='display-block' to={{
             pathname: '/molecule' // you can pass svetsko here
         }}>
