@@ -1,31 +1,55 @@
-import { useState } from "react";
-import {Link} from 'react-router-dom'
-import MoleculeImage from "./MoleculeImage";
-const MoleculeCard = (props) => {
-    const[show, setShow] = useState(false);
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import MoleculeImage from './MoleculeImage';
 
-    const clickyClicky = () =>{
-      setShow(!show)
-    }
-    console.log(props)
-    
-    const display = (<MoleculeImage name={props.name}></MoleculeImage>)
-  
-    return (<div key={props.i} className='MoleculeCard MoleculeCard-Front'>
+const MoleculeCard = ({
+  i,
+  name,
+  id,
+  atom_count,
+  bond_count,
+  deleteCallbackHandler,
+}) => {
+  const [show, setShow] = useState(false);
+
+  const clickyClicky = () => {
+    setShow(!show);
+  };
+
+  const display = <MoleculeImage name={name} />;
+
+  return (
+    <div key={i} className="MoleculeCard MoleculeCard-Front">
       <div className="MoleculeCard-Wrapper">
         {display}
-        <p className='molecule-info-title'>{props.name}</p>
-        <p>id: {props.id}</p>
-        <p>Atoms No: {props.atom_count}</p>
-        <p>Bond No: {props.bond_count}</p>
-        <Link to={'/molecule/view'}
-          state= {{ molecule : props.name }} // you can pass svetsko here
+        <p className="molecule-info-title">{name}</p>
+        <p>
+          id:
+          {id}
+        </p>
+        <p>
+          Atoms No:
+          {atom_count}
+        </p>
+        <p>
+          Bond No:
+          {bond_count}
+        </p>
+        <Link
+          to="/molecule/view"
+          state={{ molecule: name }} // you can pass svetsko here
         >
-            <button className='MoleculeCard-action'>Show</button>
+          <button className="MoleculeCard-action">Show</button>
         </Link>
-          <button className='MoleculeCard-action' onClick={()=>props.deleteCallbackHandler(props.name)}>Delete</button>
+        <button
+          className="MoleculeCard-action"
+          onClick={() => deleteCallbackHandler(name)}
+        >
+          Delete
+        </button>
       </div>
-    </div>)
-  }
+    </div>
+  );
+};
 
 export default MoleculeCard;
