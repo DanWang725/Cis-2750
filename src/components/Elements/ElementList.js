@@ -1,17 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Element from './Elements';
 import ElementForm from './ElementForm';
+import useFetchHandler from '../../shared-components/hooks/useFetchHandler';
 
 const ElementList = () => {
   const [elements, setElement] = useState(null);
-
-  const refresh = () => {
-    fetch('../test.json')
-      .then((response) => response.json())
-      .then((data) => setElement(data))
-      .then((data) => console.log(data))
-      .catch((err) => console.error(err));
-  };
+  const { isLoaded, forceFetch } = useFetchHandler('../test.json', setElement);
 
   const FetchDeleteElement = (code) => {
     console.log(code);
@@ -22,16 +16,12 @@ const ElementList = () => {
     })
       .then((response) => {
         console.log(response);
-        refresh();
+        forceFetch();
       })
       .catch((err) => console.error(err));
   };
 
-  useEffect(() => {
-    refresh();
-  }, []);
-
-  if (!elements) {
+  if (!isLoaded) {
     return (
       <div className="Molecule middle-margins content-page">
         <p>Loading elements....</p>
@@ -42,11 +32,11 @@ const ElementList = () => {
   return (
     <div className="Molecule middle-margins content-page">
       <p className="gradient-bottom">Elements</p>
-      {elements.map((element, i) => (
+      {elements?.map((element, i) => (
         <Element {...element} key={i} testDataThing={FetchDeleteElement} />
       ))}
-      <button onClick={refresh}>Refresh</button>
-      <ElementForm onDataAddition={refresh} />
+      <button onClick={forceFetch}>Refresh</button>
+      <ElementForm onDataAddition={forceFetch} />
     </div>
   );
 };

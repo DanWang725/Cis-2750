@@ -1,24 +1,13 @@
 import { useState, useEffect } from 'react';
 import MoleculeCard from './MoleculeCard';
 import MoleculeUploadTab from './MoleculeUploadTab';
-
+import useFetchHandler from '../../shared-components/hooks/useFetchHandler';
 const MoleculeList = () => {
   const [molecule, setMolecule] = useState([]);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const FetchMolecules = () => {
-    fetch('../molecule.json')
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setMolecule(data);
-        setIsLoaded(true);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  useEffect(() => {
-    FetchMolecules();
-  }, []);
+  const { isLoaded, forceFetch } = useFetchHandler(
+    '../molecule.json',
+    setMolecule,
+  );
 
   const DeleteMolecule = (code) => {
     console.log(code);
@@ -29,7 +18,7 @@ const MoleculeList = () => {
     })
       .then((response) => {
         console.log(response);
-        FetchMolecules();
+        forceFetch();
       })
       .catch((err) => console.error('lol'));
   };
@@ -59,8 +48,8 @@ const MoleculeList = () => {
         <div>There are no molecules in the database... Upload one</div>
       )}
 
-      <button onClick={() => FetchMolecules()}>Refresh</button>
-      <MoleculeUploadTab refreshHandler={FetchMolecules} />
+      <button onClick={() => forceFetch()}>Refresh</button>
+      <MoleculeUploadTab refreshHandler={forceFetch} />
     </div>
   );
 };

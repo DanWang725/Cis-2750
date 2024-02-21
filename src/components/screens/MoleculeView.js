@@ -1,25 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import useRotatingImage from '../Molecules/hooks/useRotatingImage';
 
 const MoleculeView = (props) => {
   const prop = useLocation();
+  const { isLoaded, getRotationImage } = useRotatingImage(
+    prop?.state?.molecule,
+  );
 
   const [interval, makeInterval] = useState('');
-  const [isLoaded, setReady] = useState(false);
   const [isSpinning, setSpinning] = useState(false);
   const [spinIdx, setSpinIdx] = useState(0);
   const [axis, setAxis] = useState(0);
-  const [x, setX] = useState([]);
-  const [y, setY] = useState([]);
-  const [z, setZ] = useState([]);
 
-  const setIdx = () => {
-    setSpinIdx(spinIdx + 1);
-  };
-
-  const sliderHandleChange = (event) => {
-    // console.log("spinidx: "+spinIdx)
-    // console.log("slider: "+event.target.value + " axis: " + axis)
+  const onSpinChange = (event) => {
     setSpinIdx(axis * 72 + Number(event.target.value));
   };
 
@@ -28,7 +22,6 @@ const MoleculeView = (props) => {
       setSpinning(false);
       clearInterval(interval);
     } else {
-      // console.log("spinning")
       setSpinning(true);
       makeInterval(setInterval(incrementRotation, 20));
     }
@@ -41,48 +34,12 @@ const MoleculeView = (props) => {
     }
   }
 
-  const DownloadSpin = async () => {
-    if (!prop.state) {
-      console.log(prop.state);
-      return;
-    }
-    return fetch(`../molecule/all/rotation/${prop.state.molecule}.svg`)
-      .then((response) => response.json())
-      .then((data) => {
-        setX(data.x);
-        setY(data.y);
-        setZ(data.z);
-      })
-      .catch((err) => console.error(err));
-  };
-
   function updateAxisButton(val) {
     // console.log("before:" + axis)
     setSpinIdx((spinIdx % 72) + val * 72);
     setAxis(val);
     // console.log("after:" + axis)
   }
-
-  const getRotation = (idx) => {
-    console.log(idx / 72);
-    switch (Math.floor(idx / 72)) {
-      case 0:
-        return x[idx % 72];
-      case 1:
-        return y[idx % 72];
-      case 2:
-        return z[idx % 72];
-      default:
-        console.log('error');
-        break;
-    }
-  };
-
-  useEffect(() => {
-    if (prop.state !== undefined) {
-      DownloadSpin().then(() => setReady(true));
-    }
-  }, []);
 
   if (!prop?.state) {
     return (
@@ -126,7 +83,7 @@ const MoleculeView = (props) => {
             value={spinIdx % 72}
             min={0}
             max={71}
-            onChange={sliderHandleChange}
+            onChange={onSpinChange}
           />
           <div>
             <label>Axis of Rotation</label>
@@ -156,7 +113,7 @@ const MoleculeView = (props) => {
       {isLoaded ? (
         <span
           className="Molecule-full-image"
-          dangerouslySetInnerHTML={{ __html: getRotation(spinIdx) }}
+          dangerouslySetInnerHTML={{ __html: getRotationImage(spinIdx) }}
         />
       ) : (
         <h1>Loading Image</h1>
