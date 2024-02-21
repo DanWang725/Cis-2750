@@ -20,7 +20,7 @@ const MoleculeList = () => {
         console.log(response);
         forceFetch();
       })
-      .catch((err) => console.error('lol'));
+      .catch((err) => console.error(err));
   };
 
   if (molecule.length === 0 && !isLoaded) {

@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import useFetchHandler from '../../../shared-components/hooks/useFetchHandler';
+
 const useRotatingImage = (moleculeName) => {
   const [x, setX] = useState([]);
   const [y, setY] = useState([]);
@@ -9,6 +10,7 @@ const useRotatingImage = (moleculeName) => {
     setY(data.y);
     setZ(data.z);
   };
+
   const { isLoaded } = useFetchHandler(
     `../molecule/all/rotation/${moleculeName}.svg`,
     setData,

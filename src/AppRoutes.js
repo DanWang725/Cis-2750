@@ -44,12 +44,6 @@ const AppRoutes = (props) => {
           <Route path="/molecule/view" element={<MoleculeView />} />
           <Route path="/element" element={<ElementList />} />
         </Routes>
-        {/* <button onClick={()=>showMolecules()}>Molecules</button>
-        <button onClick={()=>showElements()}>Elements</button>
-        <button onClick={()=>showMain()}>Back</button>
-        {view === 'main' && mainMenu}
-        {view === 'molecules' && moleculeList}
-        {view === 'elements' && elementList} */}
       </div>
     </HashRouter>
   );

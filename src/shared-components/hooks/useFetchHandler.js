@@ -14,6 +14,7 @@ const useFetchHandler = (
       .then(onSuccess)
       .catch(onError);
   };
+
   useEffect(() => {
     if (hasFetched) return;
 
