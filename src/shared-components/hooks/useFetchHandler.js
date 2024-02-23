@@ -8,25 +8,26 @@ const useFetchHandler = (
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
 
-  const fetchData = async () => {
-    fetch(url)
-      .then((response) => response.json())
-      .then(onSuccess)
-      .catch(onError);
-  };
-
   useEffect(() => {
-    if (hasFetched) return;
+    if (!hasFetched) {
+      setHasFetched(true);
+      setIsLoaded(false);
 
-    setHasFetched(true);
-    fetchData().then(() => setIsLoaded(true));
+      const fetchData = async () => {
+        fetch(url)
+          .then((response) => {
+            setIsLoaded(true);
+            return response.json();
+          })
+          .then(onSuccess)
+          .catch(onError);
+      };
+
+      fetchData();
+    }
   }, [hasFetched]);
 
-  const forceFetch = () => {
-    setIsLoaded(false);
-    setHasFetched(false);
-  };
-
+  const forceFetch = () => setHasFetched(false);
   return { isLoaded, forceFetch };
 };
 export default useFetchHandler;
