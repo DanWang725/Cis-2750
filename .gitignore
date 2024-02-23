@@ -25,4 +25,5 @@ yarn-error.log*
 *.so
 molecule.py
 molecule_wrap.c
+molecules.db
 /__pycache__/
