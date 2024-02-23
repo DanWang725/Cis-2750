@@ -58,6 +58,16 @@ yarn start
 
 And it will automatically run on `localhost:3000`.
 
+### Database Initialization
+
+When starting the app initially, the database will be empty. To initialize the database with default element properties - which are used to make configure how each element looks - run the following command
+
+```bash
+python3 molsql.py
+```
+
+This will initialize the database with test data to use.
+
 ### Nightmare Mode
 
 This assignment was done in nightmare mode.
