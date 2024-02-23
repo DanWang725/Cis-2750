@@ -23,4 +23,6 @@ yarn-debug.log*
 yarn-error.log*
 *.o 
 *.so
+molecule.py
+molecule_wrap.c
 /__pycache__/

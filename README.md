@@ -1,5 +1,17 @@
 # Assignment 4
 
+## Technologies
+
+The backend was built using
+
+- `swig3.0`
+- `python3.7+`
+
+The front end was built using
+
+- `ReactJS`
+- `node`
+
 ## Running
 
 There are two sections of code that will be needed to execute to run the full stack.
@@ -21,8 +33,6 @@ python3 server.py [port]
 where [port] is the specified port.
 
 The intended port to use with this server is `51584`.
-
-Then go to `localhost:[port]`
 
 ### Front End
 
