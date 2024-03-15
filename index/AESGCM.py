@@ -3,14 +3,13 @@ from NonceCipherContext import NonceEncryptContext, NonceDecryptContext
 import os
 # AES function for CTR mode
 class AESGCM:
-    def __init__(self, keylen, key):
+    def __init__(self, key):
         # recommended thing
-        self.keylen = keylen
         self.key = key
 
-    def encryptor(self):
+    def encryptor(self) -> NonceEncryptContext:
         self.nonce = os.urandom(12)
-        return NonceEncryptContext(Cipher(algorithms.AES(self.keylen), modes.GCM(self.nonce)), self.nonce, True)
+        return NonceEncryptContext(Cipher(algorithms.AES(self.key), modes.GCM(self.nonce)), self.nonce, True)
     
-    def decryptor(self):
-        return NonceDecryptContext(self.keylen, True)
+    def decryptor(self)  -> NonceDecryptContext:
+        return NonceDecryptContext(self.key, True)

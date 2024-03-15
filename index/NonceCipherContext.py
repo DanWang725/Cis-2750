@@ -22,10 +22,10 @@ class NonceEncryptContext:
 # wrapper CipherContext to handle reading of the prefix nonce during decryption. 
 # also handles CGM tag
 class NonceDecryptContext:
-    def __init__(self, keylen, CGM = False, hasPadding = False):
+    def __init__(self, key, CGM = False, hasPadding = False):
         self.hasPadding = hasPadding
         self.CGM = CGM
-        self.keylen = keylen
+        self.key = key
 
     
     def update(self, data):
@@ -36,7 +36,7 @@ class NonceDecryptContext:
             unpadder = padding.PKCS7.unpadder()
             ciphertext = unpadder.update(data[12:])
 
-        self.cipherContext = Cipher(algorithms.AES(self.keylen), modes.CTR(nonce)).decryptor()
+        self.cipherContext = Cipher(algorithms.AES(self.key), modes.CTR(nonce)).decryptor()
         
         self.plaintext = self.cipherContext.update(ciphertext)
         if(self.CGM):
