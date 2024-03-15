@@ -1,5 +1,6 @@
 from cryptography.hazmat.primitives import ciphers, padding
 from cryptography.hazmat.primitives.ciphers import algorithms, Cipher, modes
+from cryptography.exceptions import AlreadyFinalized
 
 # wrapper CipherContext to handle the addition of the nonce before the ciphertext when encrypting
 class NonceEncryptContext:
@@ -7,9 +8,14 @@ class NonceEncryptContext:
         self.cipherContext = cipherContext
         self.nonce = nonce
         self.requiresPadding = requiresPadding
-    
+        self.hasCalled = False
+    # only call update once, the context will be finalized during this call
     def update(self, data):
-        
+        # prevent multiple calls
+        if(self.hasCalled):
+            raise AlreadyFinalized()
+        self.hasCalled = True
+
         if(self.requiresPadding):
             padder = padding.PKCS7.padder()
             paddedData = padder.update(data)
@@ -26,9 +32,15 @@ class NonceDecryptContext:
         self.hasPadding = hasPadding
         self.CGM = CGM
         self.key = key
+        self.hasCalled = False
 
-    
+    # only call update once, the context will be finalized during this call
     def update(self, data):
+        # prevent multiple calls
+        if(self.hasCalled):
+            raise AlreadyFinalized()
+        self.hasCalled = True
+
         nonce = data[:12]
         ciphertext = data[12:]
 
