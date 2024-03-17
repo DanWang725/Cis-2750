@@ -1,5 +1,5 @@
 from cryptography.hazmat.primitives.ciphers import algorithms, modes, Cipher
-from NonceCipherContext import NonceEncryptContext, NonceDecryptContext
+from NonceCipherContext import DecryptContext, NonceEncryptContext, NonceDecryptContext
 import os
 # AES function for CTR mode
 class AESGCM:
@@ -13,3 +13,6 @@ class AESGCM:
     
     def decryptor(self)  -> NonceDecryptContext:
         return NonceDecryptContext(self.key, True)
+    
+    def decryptor(self, nonce)  -> NonceDecryptContext:
+        return DecryptContext(self.key, nonce, True)
