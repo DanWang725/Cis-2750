@@ -16,15 +16,11 @@ class AESCTR:
         # recommended thing
         self.key = key
 
-    def __init__(self, key):
-        # recommended thing
-        self.key = key
-
     def encryptor(self, nonce = None) -> NonceEncryptContext:
         if(nonce is None):
             nonce = os.urandom(16)
             
-        return NonceEncryptContext(Cipher(algorithms.AES(self.key), modes.CTR(nonce)).encryptor(), self.nonce) 
+        return NonceEncryptContext(Cipher(algorithms.AES(self.key), modes.CTR(nonce)).encryptor(), nonce) 
     
     def decryptor(self)  -> NonceDecryptContext:
         return NonceDecryptContext(self.key)

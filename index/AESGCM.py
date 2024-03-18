@@ -7,9 +7,10 @@ class AESGCM:
         # recommended thing
         self.key = key
 
-    def encryptor(self) -> NonceEncryptContext:
-        self.nonce = os.urandom(12)
-        return NonceEncryptContext(Cipher(algorithms.AES(self.key), modes.GCM(self.nonce)), self.nonce, True)
+    def encryptor(self, nonce = None) -> NonceEncryptContext:
+        if(nonce is None):
+            nonce = os.urandom(12)
+        return NonceEncryptContext(Cipher(algorithms.AES(self.key), modes.GCM(nonce)), nonce, True)
     
     def decryptor(self)  -> NonceDecryptContext:
         return NonceDecryptContext(self.key, True)
