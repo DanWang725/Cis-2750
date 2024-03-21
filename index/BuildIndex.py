@@ -6,6 +6,7 @@ from AESCTR import AESCTR
 from AESGCM import AESGCM
 from NonceCipherContext import NonceDecryptContext, NonceEncryptContext
 from cuckoopy import CuckooFilter
+from CryptoUtils import AESSIVWithNonce
 
 keyLength = 256
 kStuff = 1
@@ -33,13 +34,16 @@ def BuildDictionary(D):
     return {"test":[]}
 
 def BuildIndex(D, K):
+    #initialization of variables
     W = BuildDictionary(D)
     A = [None] * len(W)
-    storage = []
-    headsLookupTable = {}
-    PsiCipher = AESCTR(keyPsi);
-    ctr = 1
+    storage = [] # keeping track of each linked list head (address and key)
 
+    headsLookupTable = {} # unsecure lookup table ! should use a secure table like cuckoo table
+    
+    PsiCipher = AESCTR(keyPsi) # cipher for the PRP we use for ordering the array elements
+
+    ctr = 1
 
     for keyword in W:
         kHead = os.urandom(keyLength // 8) #initialize the ki,0 and the address of n1,j
@@ -48,17 +52,18 @@ def BuildIndex(D, K):
         storage.append((addr, kHead)) # store these for later use
 
         for j in range(len(W[keyword])): #create linked list
-            kNext = os.urandom(keyLength // 8)
-            node = Node(W[keyword][j], kNext, None)
 
+            kNext = os.urandom(keyLength // 8) # generate key to decrypt next node
+            node = Node(W[keyword][j], kNext, None) #create node with record id !!!!!! update once build dictionary has finished
+
+            # if this is not the last node in list, generate address of next node
             if(j != len(W[keyword]) - 1):
                 psuedoRandomPerm = PsiCipher.encryptor((1).to_bytes(16, "big"))
                 
                 psiCtr = psuedoRandomPerm.update((ctr + 1).to_bytes(16, "big"))
                 node.setNextAddress(psiCtr)
-            
 
-            aessiv = aead.AESSIV(keyPhi) #encrypting each node
+            aessiv = aead.AESSIV(kHead) #encrypting each node with non deterministic encryptor
             nonce = os.urandom(16)      #generating a 128-bit nonce
             ct = nonce + aessiv.encrypt(bytes(str(node),'utf-8'), [nonce]) #use AESSIV for undeterministic symmetric encryption
             
@@ -66,10 +71,10 @@ def BuildIndex(D, K):
             psuedoRandomPerm = PsiCipher.encryptor((1).to_bytes(16, "big"))
             curAddr = psuedoRandomPerm.update(ctr.to_bytes(16, "big"))
 
+            if(A[curAddr] is not None): # debugging, print if we have a collision
+                print('Debug: Collision found')
             A[curAddr] = ct
             kHead = kNext
-
-    cf = CuckooFilter(capacity=10000, bucket_size=4, fingerprint_size=1)
 
     for i in range(len(W)):
         (addr, k) = storage[i]
@@ -82,6 +87,24 @@ def BuildIndex(D, K):
         headsLookupTable["change this"] = value
     
     I = (headsLookupTable, A)
+    return I
+
+
+
+def EncryptTable(T, K):
+    attributes = ['stuff', 'stuff2'] # mock data
+
+    for attribute in attributes:
+        encryptedAttribute = AESSIVWithNonce(K, attribute)
+    
+    records = [('value1', 'value2'), ('value3', 'value4')] # mock data
+    for i in range(len(records)):
+        record = records[i]
+        for value in record:
+            encryptedValue = AESSIVWithNonce(value)
+    
+    
+
     
 
 
