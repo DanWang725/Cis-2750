@@ -7,6 +7,8 @@ from AESGCM import AESGCM
 from NonceCipherContext import NonceDecryptContext, NonceEncryptContext
 from cuckoopy import CuckooFilter
 from CryptoUtils import AESSIVWithNonce
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.ciphers.aead import AESSIV
 
 keyLength = 256
 kStuff = 1
@@ -31,11 +33,22 @@ def get_xor(a, b):
 
 GCMIV = os.urandom(12)
 def BuildDictionary(D):
-    return {"test":[]}
+    return {"aKeyword":[1], "anotherKeyword":[2]}
+
+def GetKeyAtValue(W, listVal):
+    for val in W.values():
+        if listVal in val:
+            return list(W.keys())[list(W.values()).index(val)]
 
 def BuildIndex(D, K):
     #initialization of variables
     W = BuildDictionary(D)
+    print('Contents:')
+    for k, v in W.items():
+        print(k, v)
+    print('Keys:')
+    for i in range(1, len(W)+1):
+        print(GetKeyAtValue(W, i))
     A = [None] * len(W)
     storage = [] # keeping track of each linked list head (address and key)
 
@@ -76,10 +89,12 @@ def BuildIndex(D, K):
             A[curAddr] = ct
             kHead = kNext
 
-    for i in range(len(W)):
+    for i in range(1, len(W)):
         (addr, k) = storage[i]
-        keyword = W.keys[i]
-        digest = hashes.SHA256()
+        keyword = GetKeyAtValue(W, i)
+        print(keyword)
+        digest = hashes.Hash(hashes.SHA256())
+        print('to encrypt:', keyword)
         digest.update(bytes(keyword, "utf-8"))
         val = digest.finalize()
 
@@ -105,7 +120,9 @@ def EncryptTable(T, K):
     
     
 
-    
+if __name__ == "__main__":
+    I = BuildIndex({},0)
+    print(I)
 
 
 

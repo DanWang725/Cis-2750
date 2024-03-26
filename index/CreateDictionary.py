@@ -54,16 +54,16 @@ def CreateDictionary(D):
     table = D.retrieve_all('Molecules')
     allAttributes = D.getAttributes()
     W = {}
-    print('Total Attr:', allAttributes)
-    print()
+    # print('Total Attr:', allAttributes)
+    # print()
     for k, v in W.items():
         print(k, v)
     id=1
     for record in table:
         i=0
-        print('cur record:', record)
+        # print('cur record:', record)
         for attribute in allAttributes:
-            print('cur attr:', attribute)
+            # print('cur attr:', attribute)
             literalAttr = attribute + '=' + str(record[i])
             if literalAttr in W:
                 W[literalAttr].append(id)
@@ -72,10 +72,16 @@ def CreateDictionary(D):
             # Use .append
             id=id+1
             i=i+1
-            print(W)
-        print()
-    print('W')
-    print(W)
+            # print(W)
+        # print()
+    # print('W')
+    # print(W)
+    return W, id-1
+
+def GetKeyAtValue(W, listVal):
+    for val in W.values():
+        if listVal in val:
+            return list(W.keys())[list(W.values()).index(val)]
 
 
 if __name__ == "__main__":
@@ -97,6 +103,12 @@ if __name__ == "__main__":
     db.conn.execute( """INSERT
                         INTO Molecules (NAME,  ATOM_NO,    BOND_NO)
                         VALUES ('Snow', 3, 2);""" )
-    print('Dataset:', db.retrieve_all('Molecules'))
+    # print('Dataset:', db.retrieve_all('Molecules'))
 
-    CreateDictionary(db)
+    W, n = CreateDictionary(db)
+    print(W)
+    
+    print('Indexing...')
+    for i in range(1, n+1):
+        key = GetKeyAtValue(W, i)
+        print(key)
