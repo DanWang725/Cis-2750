@@ -6,9 +6,12 @@ from AESCTR import AESCTR
 from AESGCM import AESGCM
 from NonceCipherContext import NonceDecryptContext, NonceEncryptContext
 from cuckoopy import CuckooFilter
-from CryptoUtils import AESSIVWithNonce
+from CryptoUtils import AESSIVDecryptNonce, AESSIVEncryptNonce
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.ciphers.aead import AESSIV
+from CreateDictionary import CreateDictionary, GetKeyAtValue
+
+
 
 keyLength = 256
 kStuff = 1
@@ -35,21 +38,16 @@ GCMIV = os.urandom(12)
 def BuildDictionary(D):
     return {"aKeyword":[1], "anotherKeyword":[2]}
 
-def GetKeyAtValue(W, listVal):
-    for val in W.values():
-        if listVal in val:
-            return list(W.keys())[list(W.values()).index(val)]
-
 def BuildIndex(D, K):
     #initialization of variables
-    W = BuildDictionary(D)
+    W = BuildDictionary(D) # replace with create dictionary
     print('Contents:')
     for k, v in W.items():
         print(k, v)
     print('Keys:')
     for i in range(1, len(W)+1):
         print(GetKeyAtValue(W, i))
-    A = [None] * len(W)
+    A = [None] * 10000
     storage = [] # keeping track of each linked list head (address and key)
 
     headsLookupTable = {} # unsecure lookup table ! should use a secure table like cuckoo table
@@ -73,7 +71,7 @@ def BuildIndex(D, K):
             if(j != len(W[keyword]) - 1):
                 psuedoRandomPerm = PsiCipher.encryptor((1).to_bytes(16, "big"))
                 
-                psiCtr = psuedoRandomPerm.update((ctr + 1).to_bytes(16, "big"))
+                psiCtr = psuedoRandomPerm.encrypt((ctr + 1).to_bytes(16, "big"))
                 node.setNextAddress(psiCtr)
 
             aessiv = aead.AESSIV(kHead) #encrypting each node with non deterministic encryptor
@@ -82,17 +80,17 @@ def BuildIndex(D, K):
             
             #generate the address for the current node to go
             psuedoRandomPerm = PsiCipher.encryptor((1).to_bytes(16, "big"))
-            curAddr = psuedoRandomPerm.update(ctr.to_bytes(16, "big"))
-
-            if(A[curAddr] is not None): # debugging, print if we have a collision
+            curAddr = psuedoRandomPerm.encrypt(ctr.to_bytes(16, "big"))
+            print(int.from_bytes(curAddr, 'big') % 1000)
+            nodeIndex = int.from_bytes(curAddr, 'big') % 10000
+            if(A[nodeIndex] is not None): # debugging, print if we have a collision
                 print('Debug: Collision found')
-            A[curAddr] = ct
+            A[nodeIndex] = ct
             kHead = kNext
 
     for i in range(1, len(W)):
         (addr, k) = storage[i]
         keyword = GetKeyAtValue(W, i)
-        print(keyword)
         digest = hashes.Hash(hashes.SHA256())
         print('to encrypt:', keyword)
         digest.update(bytes(keyword, "utf-8"))
@@ -110,17 +108,33 @@ def EncryptTable(T, K):
     attributes = ['stuff', 'stuff2'] # mock data
 
     for attribute in attributes:
-        encryptedAttribute = AESSIVWithNonce(K, attribute)
+        encryptedAttribute = AESSIVEncryptNonce(K, attribute)
     
     records = [('value1', 'value2'), ('value3', 'value4')] # mock data
     for i in range(len(records)):
         record = records[i]
         for value in record:
-            encryptedValue = AESSIVWithNonce(value)
+            encryptedValue = AESSIVEncryptNonce(K, value)
+
+def DecryptTable(T, K):
+    attributes = ['stuff', 'stuff2'] # mock data
+
+    for attribute in attributes:
+        decryptedAttribute = AESSIVDecryptNonce(K, attribute)
     
+    records = [('value1', 'value2'), ('value3', 'value4')] # mock data
+    for i in range(len(records)):
+        record = records[i]
+        for value in record:
+            decryptedValue = AESSIVDecryptNonce(K, value)
     
 
 if __name__ == "__main__":
+    testKey = os.urandom(32)
+    testVar = AESSIVEncryptNonce(testKey, 'among us')
+    print(testVar.hex())
+    result = AESSIVDecryptNonce(testKey, testVar)
+    print(result)
     I = BuildIndex({},0)
     print(I)
 
