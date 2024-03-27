@@ -59,8 +59,8 @@ def BuildIndex(D, K):
     for keyword in W:
         kHead = os.urandom(keyLength // 8) #initialize the ki,0 and the address of n1,j
         addressGenerator = PsiCipher.encryptor((1).to_bytes(16, "big"))
-        addr = addressGenerator.encrypt(ctr.to_bytes(16, "big"))
-        storage.append((addr, kHead)) # store these for later use
+        head = addressGenerator.encrypt(ctr.to_bytes(16, "big"))
+        storage.append((head, kHead)) # store these for later use
 
         for j in range(len(W[keyword])): #create linked list
 
@@ -89,7 +89,7 @@ def BuildIndex(D, K):
             kHead = kNext
 
     for i in range(1, len(W)):
-        (addr, k) = storage[i]
+        (addr, k) = storage[i] #heads of nodes
         keyword = GetKeyAtValue(W, i)
         digest = hashes.Hash(hashes.SHA256())
         print('to encrypt:', keyword)
@@ -97,7 +97,8 @@ def BuildIndex(D, K):
         val = digest.finalize()
 
         value = get_xor(addr + k, val)
-        headsLookupTable["change this"] = value
+        
+        headsLookupTable['change this'] = value
     
     I = (headsLookupTable, A)
     return I
