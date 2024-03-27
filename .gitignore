@@ -27,3 +27,4 @@ molecule.py
 molecule_wrap.c
 molecules.db
 /__pycache__/
+*.pyc
