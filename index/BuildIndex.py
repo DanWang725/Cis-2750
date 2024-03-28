@@ -37,7 +37,7 @@ def get_xor(a, b):
 GCMIV = os.urandom(12)
 
 # Generate a search index I
-def BuildIndex(W, K):
+def BuildIndex(W,n,K):
 
     ctr = 1 # Set global counter
 
@@ -45,21 +45,32 @@ def BuildIndex(W, K):
     A = [None] * m # Array A creation
 
     storage = [] # keeping track of each linked list head (address and key)
-
-    headsLookupTable = {} # unsecure lookup table ! should use a secure table like cuckoo table
+    ids = [] # keeping track of traversed ids
     
     PsiCipher = AESCTR(keyPsi) # cipher for the PRP we use for ordering the array elements
 
-    for keyword in W:
+    for i in range(1, n+1):
+
+        #create linked list
         kHead = os.urandom(keyLength // 8) #initialize the ki,0 and the address of n1,j
         addressGenerator = PsiCipher.encryptor((1).to_bytes(16, "big"))
         addr = addressGenerator.encrypt(ctr.to_bytes(16, "big"))
         storage.append((addr, kHead)) # store these for later use
 
-        for j in range(len(W[keyword])): #create linked list
+        keyword = GetKeyAtValue(W, i) # get keyword
 
+        # Traverse ids (vals) of keywords
+        print('at keyword:', keyword)
+        for j in range(len(W[keyword])):
+
+            if W[keyword][j] in ids: # check if id already traversed
+                print(W[keyword][j], 'already exists!\n')
+                continue
+            
+            print('encrypt id:', W[keyword][j], 'from j index', j, '\n')
             kNext = os.urandom(keyLength // 8) # generate key ki,j to decrypt next node
             node = Node(W[keyword][j], kNext, ctr+1) #create node with record id, key, and address in A of node
+            ids.append(W[keyword][j])
 
             # if this is not the last node in list, generate address of next node
             if(j != len(W[keyword]) - 1):
@@ -82,29 +93,33 @@ def BuildIndex(W, K):
             #     print('Debug: Collision found')
 
             A[nodeIndex] = ct # Store node in A (pseudorandom order)
-            print('store node', W[keyword][j], 'at', nodeIndex)
+            # print('store node', W[keyword][j], 'at', nodeIndex)
             # print('A:', A)
             kHead = kNext
             ctr = ctr+1 # increment counter
 
     # TODO: Fill in remaining entries of A with rando values
 
-    # Look up table creation
-    for i in range(1, len(W)):
-        (addr, k) = storage[i]
+    # Look up table T creation
+    T = {} # unsecure lookup table ! should use a secure table like cuckoo table
+    for i in range(1, n+1):
+        (addr, k) = storage[i-1]
         keyword = GetKeyAtValue(W, i)
+        # print('encrypt keyword:', keyword)
         digest = hashes.Hash(hashes.SHA256())
-        # print('to encrypt:', keyword)
         digest.update(bytes(keyword, "utf-8"))
         val = digest.finalize()
         value = get_xor(addr + k, val)
-        headsLookupTable["change this"] = value
+        if keyword in T:
+            T[keyword].append(value) # add to value list of keyword
+        else:
+            T[keyword] = [value] # create new value list for keyword
     
     print('table:')
-    print(headsLookupTable)
+    print(T)
     print('A:')
     print(A)
-    I = (headsLookupTable, A)
+    I = (A, T)
     return I
 
 
@@ -155,7 +170,7 @@ if __name__ == "__main__":
     W, n = CreateDictionary(db)
     print(W)
 
-    I = BuildIndex(W,0)
+    I = BuildIndex(W,n,0)
     # print(I)
 
 

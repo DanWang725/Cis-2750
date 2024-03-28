@@ -64,11 +64,11 @@ def CreateDictionary(D):
         # print('cur record:', record)
         for attribute in allAttributes:
             # print('cur attr:', attribute)
-            literalAttr = attribute + '=' + str(record[i])
-            if literalAttr in W:
-                W[literalAttr].append(id)
+            keyword = attribute + '=' + str(record[i]) # create keyword from record
+            if keyword in W:
+                W[keyword].append(id) # add to id list of keyword
             else:
-                W[literalAttr]=[id]
+                W[keyword]=[id] # create new id list for keyword
             # Use .append
             id=id+1
             i=i+1
