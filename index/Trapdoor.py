@@ -1,5 +1,6 @@
 import sqlparse
-from CryptoUtils import AESSIVEncryptNonce
+from CryptoUtils import AESSIVEncryptNonce, phiFunction, get_xor
+
 
 def ExtractKeywords(sql):
     # print(sql)
@@ -32,7 +33,10 @@ def ExtractKeywords(sql):
 
 def generateTrapdoor(sql, K):
     keywords = ExtractKeywords("""SELECT * FROM PATIENT WHERE Name='Mary' AND Surname='Grant';""")
-    AESSIVEncryptNonce(K, keywords[0]);
+    AESSIVEncryptNonce(K, keywords[0])
+    pos = keywords[0]
+    kW = phiFunction(K, keywords[0])
+    return (pos, kW)
     
 
 
