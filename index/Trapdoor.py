@@ -1,5 +1,5 @@
 import sqlparse
-from CryptoUtils import AESSIVWithNonce
+from CryptoUtils import AESSIVEncryptNonce
 
 def ExtractKeywords(sql):
     # print(sql)
@@ -32,7 +32,7 @@ def ExtractKeywords(sql):
 
 def generateTrapdoor(sql, K):
     keywords = ExtractKeywords("""SELECT * FROM PATIENT WHERE Name='Mary' AND Surname='Grant';""")
-    AESSIVWithNonce(K, keywords[0]);
+    AESSIVEncryptNonce(K, keywords[0]);
     
 
 

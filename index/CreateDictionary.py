@@ -1,53 +1,4 @@
-import os
-import sqlite3
 
-# Class to support database operations
-class Database:
-
-    # Constructor
-    def __init__(self, reset=False):
-        if reset == True and os.path.exists('molecules.db'):
-            os.remove('molecules.db')
-        self.conn = sqlite3.connect('molecules.db')
-
-    # This method creates tables
-    def create_tables(self):
-        self.conn.execute("""CREATE TABLE IF NOT EXISTS Molecules 
-                        (   NAME            TEXT            NOT NULL,
-                            ATOM_NO         INTEGER         NOT NULL,
-                            BOND_NO         INTEGER         NOT NULL)""")
-        # Commit transaction
-        self.conn.commit()
-
-    # This method adds a molecule to the Molecules table
-    def add_molecule(self, name, atom_no, bond_no):
-        self.conn.execute("""INSERT OR IGNORE
-                            INTO Molecules (NAME, ATOM_NO, BOND_NO)
-                            VALUES ('%s', %s, %s)""" % (name, atom_no, bond_no))
-        # Commit transaction
-        self.conn.commit()
-    
-    # This method retrieves all entries from a table
-    def retrieve_all(self, table):
-        entries = self.conn.execute("SELECT * FROM %s" % table).fetchall()
-        return entries
-    
-    # This method checks if an entry already exists within a table
-    def check_entry(self, table, attribute, entry):
-        val = self.conn.execute("""SELECT EXISTS(SELECT 1 FROM %s WHERE %s.%s='%s')""" % (table, table, attribute, entry)).fetchall()
-        exists = int(val[0][0])
-        return exists
-    
-    # This method deletes an entry from a table
-    def delete_entry(self, table, attribute, entry):
-        self.conn.execute("DELETE from %s WHERE %s.%s='%s'" % (table, table, attribute, entry))
-        # Commit transaction
-        self.conn.commit()
-
-    def getAttributes(self):
-        cur = self.conn.execute("SELECT * FROM Molecules")
-        attr = list(map(lambda x: x[0], cur.description))
-        return attr
 
 # Constructs a dictionary W from database D
 def CreateDictionary(D):
@@ -64,11 +15,11 @@ def CreateDictionary(D):
         # print('cur record:', record)
         for attribute in allAttributes:
             # print('cur attr:', attribute)
-            literalAttr = attribute + '=' + str(record[i])
-            if literalAttr in W:
-                W[literalAttr].append(id)
+            keyword = attribute + '=' + str(record[i]) # create keyword from record
+            if keyword in W:
+                W[keyword].append(id) # add to id list of keyword
             else:
-                W[literalAttr]=[id]
+                W[keyword]=[id] # create new id list for keyword
             # Use .append
             id=id+1
             i=i+1
@@ -78,37 +29,11 @@ def CreateDictionary(D):
     # print(W)
     return W, id-1
 
-def GetKeyAtValue(W, listVal):
-    for val in W.values():
-        if listVal in val:
-            return list(W.keys())[list(W.values()).index(val)]
+# Retrieves keyword from id
+def GetKeyAtValue(W, id):
+    for idlist in W.values():
+        # find keyword with corresponding id
+        if id in idlist:
+            return list(W.keys())[list(W.values()).index(idlist)] # return keyword of id
 
 
-if __name__ == "__main__":
-    db = Database(reset=True)
-    db.create_tables()
-
-    # db.add_molecule('Water', 1, 1)
-    # ret = db.retrieve_all('Molecules')
-    # print(ret)
-
-    # CreateDictionary(db)
-
-    db.conn.execute( """INSERT
-                        INTO Molecules (NAME,  ATOM_NO,    BOND_NO)
-                        VALUES ('Fire', 1, 1);""" )
-    db.conn.execute( """INSERT
-                        INTO Molecules (NAME,  ATOM_NO,    BOND_NO)
-                        VALUES ('Water', 2, 1);""" )
-    db.conn.execute( """INSERT
-                        INTO Molecules (NAME,  ATOM_NO,    BOND_NO)
-                        VALUES ('Snow', 3, 2);""" )
-    # print('Dataset:', db.retrieve_all('Molecules'))
-
-    W, n = CreateDictionary(db)
-    print(W)
-    
-    print('Indexing...')
-    for i in range(1, n+1):
-        key = GetKeyAtValue(W, i)
-        print(key)
