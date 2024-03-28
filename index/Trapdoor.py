@@ -32,13 +32,13 @@ def ExtractKeywords(sql):
         # print("\nstuff", token)
 
 def generateTrapdoor(sql, K):
-    keywords = ExtractKeywords("""SELECT * FROM PATIENT WHERE Name='Mary' AND Surname='Grant';""")
+    keywords = ExtractKeywords(sql)
     # AESSIVEncryptNonce(K, keywords[0])
     trapdoors = []
     for keyword in keywords:
         pos = keyword
         kW = phiFunction(K, keyword)
-        trapdoors.append((pos, kW))
+        trapdoors.append((pos, kW.hex()))
     return trapdoors
     
 

@@ -90,13 +90,13 @@ print('Completed BuildIndex!\n\n')
 
 # Test Trapdoor
 print('Testing Trapdoor...')
-T = generateTrapdoor(0,os.urandom(32))
+T = generateTrapdoor("""SELECT * FROM Molecules WHERE NAME='fire';""",os.urandom(16))
 print('Completed Trapdoor!\n\n')
 
 
 # Test Search
 print('Testing Search...')
-Q = Search(0,0)
+Q = Search(I,T)
 print('Completed Search!\n\n')
 
 
