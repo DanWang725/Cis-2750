@@ -6,7 +6,7 @@ from AESCTR import AESCTR
 from AESGCM import AESGCM
 from NonceCipherContext import NonceDecryptContext, NonceEncryptContext
 from cuckoopy import CuckooFilter
-from CryptoUtils import AESSIVDecryptNonce, AESSIVEncryptNonce
+from CryptoUtils import AESSIVDecryptNonce, AESSIVEncryptNonce, phiFunction, get_xor
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.ciphers.aead import AESSIV
 from CreateDictionary import GetKeyAtValue
@@ -19,20 +19,7 @@ keyPsi = os.urandom(256//8)
 keyPhi = aead.AESSIV.generate_key(256)
 mockVal = bytes('aa', 'utf-8')
 
-# https://www.geeksforgeeks.org/xor-two-binary-strings-of-unequal-lengths/
-def get_xor(a, b):
-    result = ""                 # Initialize an empty string to store the XOR result
-    n = len(a)                  
-    m = len(b)                 
-    length = max(n, m)         
-     
-    for i in range(length):     # Iterate through each bit position
-        x = int(a[n - i - 1]) if i < n else 0   # Get i-th bit of 'a' or 0 if it doesn't exist
-        y = int(b[m - i - 1]) if i < m else 0   # Get i-th bit of 'b' or 0 if it doesn't exist
-        z = x ^ y               # Calculate XOR of x and y
-        result = str(z) + result               # Prepend the XOR result to the 'result' string
-     
-    return result
+
 
 GCMIV = os.urandom(12)
 
@@ -105,10 +92,9 @@ def BuildIndex(W,n,K):
     for i in range(1, n+1):
         (addr, k) = storage[i-1] #heads of nodes
         keyword = GetKeyAtValue(W, i)
+        val = phiFunction(keyPhi, keyword)
         # print('encrypt keyword:', keyword)
-        digest = hashes.Hash(hashes.SHA256())
-        digest.update(bytes(keyword, "utf-8"))
-        val = digest.finalize()
+
         value = get_xor(addr + k, val)
         if keyword in T:
             T[keyword].append(value) # add to value list of keyword
