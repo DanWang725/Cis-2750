@@ -1,6 +1,6 @@
 import sqlparse
 from CryptoUtils import AESSIVEncryptNonce, phiFunction, get_xor
-
+import os
 
 def ExtractKeywords(sql):
     # print(sql)
@@ -24,7 +24,7 @@ def ExtractKeywords(sql):
             # print(token.token_next(1)[1])
             print("output: ",temp)
             print("comparisons:", temp.split("AND"))
-            return temp
+            return temp.split("AND")
             # nextToken = token.token_next(1)
             # print('Occurrances',nextToken)
             # print(nextToken[1])
@@ -33,12 +33,20 @@ def ExtractKeywords(sql):
 
 def generateTrapdoor(sql, K):
     keywords = ExtractKeywords("""SELECT * FROM PATIENT WHERE Name='Mary' AND Surname='Grant';""")
-    AESSIVEncryptNonce(K, keywords[0])
-    pos = keywords[0]
-    kW = phiFunction(K, keywords[0])
-    return (pos, kW)
+    # AESSIVEncryptNonce(K, keywords[0])
+    trapdoors = []
+    for keyword in keywords:
+        pos = keyword
+        kW = phiFunction(K, keyword)
+        trapdoors.append((pos, kW))
+    return trapdoors
     
 
 
 if __name__ == "__main__":
-        keywords = ExtractKeywords("""SELECT * FROM PATIENT WHERE Name='Mary' AND Surname='Grant';""")
+        key = os.urandom(16)
+        t = generateTrapdoor("""SELECT * FROM PATIENT WHERE Name='Mary' AND Surname='Grant';""" , key)
+        t2 = generateTrapdoor("""SELECT * FROM PATIENT WHERE Name='Mary';""" , key)
+        print('trapdoor', t)
+        print('second trapdoor', t2)
+    
