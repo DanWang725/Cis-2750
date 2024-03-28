@@ -9,7 +9,7 @@ from cuckoopy import CuckooFilter
 from CryptoUtils import AESSIVDecryptNonce, AESSIVEncryptNonce
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.ciphers.aead import AESSIV
-from CreateDictionary import CreateDictionary, GetKeyAtValue, Database
+from CreateDictionary import GetKeyAtValue
 
 
 
@@ -60,14 +60,14 @@ def BuildIndex(W,n,K):
         keyword = GetKeyAtValue(W, i) # get keyword
 
         # Traverse ids (vals) of keywords
-        print('at keyword:', keyword)
+        # print('at keyword:', keyword)
         for j in range(len(W[keyword])):
 
             if W[keyword][j] in ids: # check if id already traversed
-                print(W[keyword][j], 'already exists!\n')
+                # print(W[keyword][j], 'already exists!\n')
                 continue
             
-            print('encrypt id:', W[keyword][j], 'from j index', j, '\n')
+            # print('encrypt id:', W[keyword][j], 'from j index', j, '\n')
             kNext = os.urandom(keyLength // 8) # generate key ki,j to decrypt next node
             node = Node(W[keyword][j], kNext, ctr+1) #create node with record id, key, and address in A of node
             ids.append(W[keyword][j])
@@ -77,7 +77,7 @@ def BuildIndex(W,n,K):
                 psuedoRandomPerm = PsiCipher.encryptor((1).to_bytes(16, "big"))
                 psiCtr = psuedoRandomPerm.encrypt((ctr + 1).to_bytes(16, "big"))
                 node.setNextAddress(psiCtr)
-                print('new address gen!')
+                # print('new address gen!')
 
             aessiv = aead.AESSIV(kHead) #encrypting each node with non deterministic encryptor
             nonce = os.urandom(16)      #generating a 128-bit nonce
@@ -115,10 +115,10 @@ def BuildIndex(W,n,K):
         else:
             T[keyword] = [value] # create new value list for keyword
     
-    print('table:')
-    print(T)
-    print('A:')
-    print(A)
+    # print('table:')
+    # print(T)
+    # print('A:')
+    # print(A)
     I = (A, T)
     return I
 
@@ -149,37 +149,11 @@ def DecryptTable(T, K):
             decryptedValue = AESSIVDecryptNonce(K, value)
     
 
-if __name__ == "__main__":
-    # testKey = os.urandom(32)
-    # testVar = AESSIVEncryptNonce(testKey, 'among us')
-    # print(testVar.hex())
-    # result = AESSIVDecryptNonce(testKey, testVar)
-    # print(result)
-
-    db = Database(reset=True)
-    db.create_tables()
-    db.conn.execute( """INSERT
-                        INTO Molecules (NAME,  ATOM_NO,    BOND_NO)
-                        VALUES ('Fire', 1, 1);""" )
-    db.conn.execute( """INSERT
-                        INTO Molecules (NAME,  ATOM_NO,    BOND_NO)
-                        VALUES ('Water', 2, 1);""" )
-    db.conn.execute( """INSERT
-                        INTO Molecules (NAME,  ATOM_NO,    BOND_NO)
-                        VALUES ('Snow', 3, 2);""" )
-    W, n = CreateDictionary(db)
-    print(W)
-
-    I = BuildIndex(W,n,0)
-    # print(I)
 
 
+# testKey = os.urandom(32)
+# testVar = AESSIVEncryptNonce(testKey, 'among us')
+# print(testVar.hex())
+# result = AESSIVDecryptNonce(testKey, testVar)
+# print(result)
 
-            
-            
-            
-            
-
-            
-                
-            
